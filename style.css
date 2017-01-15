@@ -1,0 +1,206 @@
+*{
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+body {background-color: #666}
+
+#game_page{position: relative; height: 100%}
+
+#left_column{position: absolute; width: 50%; left: 0%; height: 90%; margin: 7px}
+#middle_column{position: absolute; width: 25%; left: 50%; margin: 15px}
+#right_column{position: absolute; width: 25%; left: 75%; margin: 7px}
+
+.resource_column{float: left; margin-right: 5px}
+#resource_column_0{margin-right: 20px}
+#resource_column_3{float: none}
+
+.tooltip{position: absolute; top: 100%; display: none; border: 1px solid #000; border-radius: 3px; background-color: #ccc; margin-top: 10px; width: 90%}
+.tooltip_heading{font-weight: bold; background-color: #000; color: #fff; padding: 3px; margin-bottom: 3px}
+.tooltip_body{padding: 3px;}
+.strong{font-weight: bold}
+
+.heavens{font-weight: bold}
+
+.label{margin-bottom: 10px; min-height: 23px}
+
+.job_holder{width: 100%; display: none; position: relative; min-height: 24px}
+.job_name{position: relative; padding-top: 3px; width: 80%}
+.job_plus_button{position: absolute; border: 1px solid #000; border-radius: 3px; width: 20px; height: 20px; background-color: #ddd; color: #000; text-align: center; right: 25px; top: 0px; font-size: 17px}
+.job_minus_button{position: absolute; border: 1px solid #000; border-radius: 3px; width: 20px; height: 20px; background-color: #ddd; color: #000; text-align: center; right: 0px; top: 0px; font-size: 17px}
+.job_xp_bar{position: relative; border: 1px solid #fff; margin-top: 1px; margin-right: 10px; margin-bottom: 3px; height: 2px; background-color: #fff; overflow: hidden}
+.job_xp_fill{position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background-color: #666}
+
+.table_button{border: 1px solid #000; border-radius: 3px; width: 20px; background-color: #ddd; color: #000; padding: 2px; text-align: center}
+
+.ally{width: 100%; display: none}
+.ally_name{}
+.ally_value{text-align: right}
+.ally_max{text-align: left}
+.ally_button{border: 1px solid #000; border-radius: 3px; background-color: #ddd; color: #000; width: 21px; padding: 2px; text-align: center}
+
+.upgrade {display: none; text-align: center; position: relative; border: 1px solid #000; margin: 2px; height: 23px; background-color: #ddd; overflow: hidden; border-radius: 3px}
+.large_button {border: 1px solid #000; border-radius: 3px; height: 21px; background-color: #ddd; color: #000; text-align: center}
+.small_button {border: 1px solid #000; border-radius: 3px; width: 20px; background-color: #ddd; color: #000; padding: 2px; text-align: center; float: right}
+
+.sleep_haze{position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; opacity: 0.65; background-color: #000; z-index: 99; display: none}
+
+.temple_main{margin-bottom: 20px}
+
+.locked_node{position: relative; display: none; overflow: hidden; height: 23px; margin-bottom: 3px; width: 100%}
+.node_heading{position: relative; width: 100%}
+.node_button{position: absolute; top: 0px; border: 1px solid #000; height: 21px; background-color: #ddd; overflow: hidden; border-radius: 3px; text-align: center}
+.node_inline_button{position: relative; top: 0px; border: 1px solid #000; height: 21px; background-color: #ddd; overflow: hidden; border-radius: 3px; text-align: center}
+.node_button_full{right: 0px; width: 100%}
+.node_button_wide{right: 0px; width: 50%}
+.node_button_narrow{right: 0px; width: 21px}
+.node_button_med{right: 0px; width: 34%}
+.node_button_minus{right: 35%; width: 7%}
+.node_button_plus{right: 43%; width: 7%}
+.node_button_fill{position: absolute; top: 0px; width: 100%; height: 100%; background-color: #888}
+.node_button_text{position: absolute; top: 0px; width: 100%; text-align: center; background: transparent}
+.node_button_no_press{opacity: 0.25}
+.node_button_sub_cost{color: #550}
+.node_button_grey_out{opacity: 0.5}
+.node_button_highlight{border-color: #ddd}
+.node_title{position: relative; height: 23px; white-space: nowrap; top: 3px}
+.node_first_line{border-top: 1px dotted black; margin-top: 2px; margin-right: 10px}
+.node_lock_button{position: absolute; right: 0%; font-size: 10px; z-index: 10}
+.node_line{position: relative; width: 100%; margin-right: 10px}
+.node_line_fixed_height{height: 23px}
+.node_dropdown{position: relative; min-height: 25px}
+.tall{height: 23px}
+.node_footer{height: 9px}
+
+.idol_button_minus{right: 0px; width: 7%}
+.idol_button_plus{right: 8%; width: 7%}
+
+.trip_planner{margin-bottom: 5px}
+
+.dropdown{position: relative; width: 100%; height: 25px}
+.dropdown{position: relative; width: 100%; height: 25px}
+.dropdown_text{position: aboslute; top: 2px; left: 0px; width: 50%}
+.dropdown_button{position: absolute; top: 0px; right: 0px; width: 50%; border: 1px solid #000; height: 21px; background-color: #ddd; border-radius: 3px; text-align: center}
+.dropdown_menu{position: absolute; top: 0px; right: 0px; width: 50%; border: 1px solid #000; background-color: #ddd; border-radius: 3px; text-align: center; display: none; z-index: 10; min-height: 23px}
+.dropdown_selected{text-shadow: 1px 1px #000; color: #440}
+
+.spinner{position: relative; width: 100%; height: 25px}
+.spinner_text{position: absolute; top: 2px; left: 0px; width: 50%}
+.spinner_plus{position: absolute; top: 0px; right: 25px; width: 21px; border: 1px solid #000; height: 21px; background-color: #ddd; border-radius: 3px; text-align: center}
+.spinner_minus{position: absolute; top: 0px; right: 0px; width: 21px; border: 1px solid #000; height: 21px; background-color: #ddd; border-radius: 3px; text-align: center}
+
+
+.vision_fill{width: 200%; background: -moz-linear-gradient(right, transparent, #666, #666); background: linear-gradient(to right, transparent, #666, #666)}
+
+.junction{border: 2px solid #000; border-radius: 5px; box-shadow: 5px 5px 3px #333;}
+.junction_body{height: 100%}
+.junction_header{background-color: #000; min-height: 35px;}
+.junction_body_left{height: 95%; position: absolute; left: 7px; width: 48%; overflow-y: auto}
+.junction_body_right{height: 95%; position: absolute; left: 50%; width: 48%; overflow-y: auto}
+
+.tab_header{color: #fff; text-shadow: 2px 2px 1px #666; font-weight: bold; border: 1px solid #fff; float: left; margin: 5px; padding: 3px; display: none}
+.tab_header_select{color: #000; background-color: #999}
+.tab_header_red{color: #f55; text-shadow: 2px 2px 1px #622; font-weight: bold; border: 1px solid #f55; float: left; margin: 5px; padding: 3px; display: none}
+.tab_header_select_red{color: #000; background-color: #c33}
+.tab_header_alert{color: #f55; text-shadow: 2px 2px 1px #622; border: 1px solid #f55; float: left; margin: 5px; padding: 3px; display: none}
+.tab_body{margin: 2px}
+
+.section{margin-bottom: 15px; display: none}
+.section_header{font-weight: bold; border-bottom: 1px solid #000; margin-bottom: 3px}
+
+.resource_table{margin-bottom: 20px}
+.warehouse_table{display: none}
+.blank_resource{height: 12px}
+.resource{display: none;}
+.resource_name{padding-right: 20px}
+.resource_current{text-align: right}
+.resource_max{}
+.resource_tick{}
+.resource_warn{color: #700}
+.resource_warn_bright{color: #c00}
+
+.building{display: none; position: relative; border: 1px solid #000; margin: 2px; height: 23px; background-color: #ddd; border-radius: 3px; text-align: center}
+.building_cant_buy{opacity: 0.5}
+.building_cash{background-color: #ddb}
+
+.spell{display: none; position: relative; border: 1px solid #000; margin: 2px; height: 23px; background-color: #ddd; overflow: hidden; border-radius: 3px}
+.spell_fill{position: absolute; width: 100%; height: 100%; background-color: #888}
+.spell_name{position: absolute; width: 100%; height: 100%; background: transparent; text-align: center}
+.spell_cooldown{color: #444}
+
+.commerce_line{position: relative; height: 25px}
+.commerce_merchants{position: relative; width: 100%}
+
+.trade{position: relative; border: 1px solid #000; margin: 3px; background-color: #888; border-radius: 3px; min-height: 50px}
+.trade_offer{margin: 3px; width: 65%}
+.trade_accept{position: absolute; margin: 3px; width: 30%; left: 67%; background-color: #ddd; border-radius: 3px; border: 1px solid #000; text-align: center}
+.trade_reject{position: absolute; margin: 3px; width: 30%; top: 25px; left: 67%; background-color: #ddd; border-radius: 3px; border: 1px solid #000; text-align: center}
+
+.log{}
+.log_body{min-height: 500px}
+.log_header{background-color: #000; min-height: 35px;}
+.log_line_tech{text-shadow: 2px 2px 5px #630}
+.log_line_big_death{text-shadow: 2px 2px 5px #500}
+.log_line_fortune{text-shadow: 2px 2px 5px #020}
+
+.sub_log_header{color: #fff; text-shadow: 2px 2px 1px #666; font-weight: bold; border: 1px solid #fff; float: left; margin: 5px; padding: 3px}
+.sub_log_header_select{color: #000; background-color: #999}
+.sub_log_body{margin: 2px}
+
+.starchart{width: 100%; position: relative}
+.starchart_backdrop{position: absolute; top: 0px; left: 0px; z-index = -1}
+.starchart_canvas{position: absolute; top: 0px; left: 0px}
+.starchart_sign{font-size: 30px; font-weight: bold; width: 30px; height: 30px; text-align: center; z-index: 5; position: absolute; display: none}
+.starchart_sign_highlight{color: #fff; text-shadow: 2px 2px 1px #000}
+.starchart_sign_selected{text-shadow: 1px 1px 3px #dd0, -1px -1px 3px #dd0}
+
+.mysticism{position: relative; display: none}
+.mysticism_choices{width: 100%; display: none}
+.mysticism_choice_row{}
+.mysticism_choice{border: 1px solid #000; border-radius: 3px; background-color: #ddd; color: #000; padding: 2px; text-align: center}
+.mysticism_or{width: 20px; font-weight: bold}
+
+.mine_line{position: relative; height: 25px}
+
+.expedition_section{position: relative}
+
+.world_map{position: relative}
+.map_tile{position: absolute; width: 45%; height: 45%; border: 1px solid black; box-shadow: 2px 2px 2px black; background-color: #666}
+.map_image{position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; background-size: contain;transform-origin: top left;-webkit-transform-origin: top left;-ms-transform-origin: top left;}
+.map_image_rotate_1{transform: rotate(90deg) translateY(-100%);-webkit-transform: rotate(90deg) translateY(-100%); -ms-transform: rotate(90deg) translateY(-100%);}
+.map_image_rotate_2{transform: rotate(180deg) translate(-100%, -100%);  -webkit-transform: rotate(180deg) translate(-100%, -100%); -ms-transform: rotate(180deg) translateX(-100%, -100%);}
+.map_image_rotate_3{transform: rotate(270deg) translateX(-100%);-webkit-transform: rotate(270deg) translateX(-100%); -ms-transform: rotate(270deg) translateX(-100%);}
+.map_tile_highlight {box-shadow: 1px 1px 3px #dd0, -1px -1px 3px #dd0}
+.interest{font-weight: bold; position: absolute; color: #000; text-shadow: 1px 1px 2px #555}
+.interest_expired{color: #555; text-shadow: 1px 1px 2px #aaa}
+.interest_highlight {text-shadow: 1px 1px 3px #dd0, -1px -1px 3px #dd0}
+.interest_flag{font-size: 50%; display: none;}
+.interest_flag_container{position: absolute; right: 100%; top: 0%; text-align: right}
+
+.horrific{text-shadow: 2px 2px 5px #300}
+.exciting{text-shadow: 2px 2px 5px #420}
+
+.import_box{position: fixed; right: 1%; bottom: 1%; height: 30%; width: 30%; background-color: #ddd; border: 1px solid black; border-radius: 3px; display: none}
+.import_text{-moz-user-select: auto; -webkit-user-select: auto; -ms-user-select: auto; position: absolute; height: 80%; width: 90%; margin: 10px}
+.export_text{-moz-user-select: all; -webkit-user-select: all; -ms-user-select: all; position: absolute; height: 80%; width: 90%; margin: 10px}
+.import_button{position: absolute; bottom: 0%; margin: 10px; border: 1px solid black; border-radius: 3px; background-color: #fff; height: 23px; width: 90%; text-align: center}
+.import_close{position: absolute; right: 0; top: 0; height: 23px; width: 23px}
+
+.grad_fill{
+	background: #ddd; /* For browsers that do not support gradients */
+	background: -webkit-linear-gradient(left top, #ddd, #bbb); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(bottom right, #ddd, #bbb); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(bottom right, #ddd, #bbb); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(to bottom right, #ddd, #bbb); /* Standard syntax */
+}
+
+.rev_grad {
+	background: #ddd; /* For browsers that do not support gradients */
+	background: -webkit-linear-gradient(bottom right, #ddd, #bbb); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(top left, #ddd, #bbb); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(top left, #ddd, #bbb); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(to top left, #ddd, #bbb); /* Standard syntax */
+}
+
+.override_color{color: #666 !important}
