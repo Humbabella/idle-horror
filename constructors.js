@@ -46,13 +46,8 @@ it.constructors = {
 			description: args.description,
 			effect_text: args.effect_text,
 			love_text: args.love_text,
-			sign_info: {
-				name: args.sign.name,
-				tooltip: args.sign.tooltip,
-				apply: args.sign.apply,
-				atoms: args.sign.atoms,
-				icon: args.sign.icon + '&#65038;'
-			},
+			atoms: [],
+			apply: args.apply,
 			ascension: 0,
 			awake: args.awake,
 			stature: args.stature || 1,
@@ -64,52 +59,91 @@ it.constructors = {
 			tribute_cost_function: args.tribute_cost_function,
 			tribute_cost: {installments: {made: 0}},
 			save_id: id,
-			save_parameters: {}
+			save_parameters: {},
+			sign_name: args.sign_name,
+			sign_icon: args.sign_icon + '&#65038;',
+			sign_tooltip: args.sign_tooltip,
+			signs: [],
+			calendar_line: H.e('div', it.heavens.node, 'sign_line', args.sign_name)
+		}
+		
+		function show_sign_tooltip (e) {
+			it.tooltip.show (e, deity.sign_tooltip, deity.sign_name);
+		}
+		
+		deity.calendar_line.addEventListener('mouseover', show_sign_tooltip);
+		deity.calendar_line.addEventListener('mouseout', it.tooltip.hide)
+		
+		deity.check_active = function () {
+			var i, a = false;
+			for (i in deity.signs) {
+				if (deity.signs[i].placement<=1) {
+					a = true;
+				}
+			}
+			if (a) {
+				for (i in deity.atoms) {
+					deity.atoms[i].disabled = (deity.atoms[i].hatred.indexOf(deity.hatred)==-1)
+				}
+				deity.calendar_line.style.display = 'block';
+			} else {
+				for (i in deity.atoms) {
+					deity.atoms[i].disabled = true;
+				}
+				deity.calendar_line.style.display = 'none';
+			}
+			H.apply_atoms(deity);
+		}
+		
+		function add_atom(z) {
+			deity.atoms.push({
+				hatred: z.hatred,
+				type: z.type,
+				target: z.target,
+				order: z.order,
+				func: function (x) {
+					return (z.func(x, deity))
+				},
+				disabled: true
+			})
+		}
+		
+		for (i in args.atoms) {
+			add_atom(args.atoms[i])
 		}
 		
 		deity.get_sign = function (load) {
-			var h = (load&&typeof(load.hatred)=='number' ? load.hatred : deity.hatred)
 			
 			var r = {
 				id: id,
 				deity: deity,
-				name: deity.sign_info.name,
-				tooltip: deity.sign_info.tooltip,
-				apply: deity.sign_info.apply,
-				node: H.e('div', it.starchart.node, 'starchart_sign', deity.sign_info.icon),
-				atoms: [],
-				ascension: deity.ascension,
-				used: (load&&load.used) || false,
-				power: (load&&load.power) || deity.power
+				name: deity.sign_name,
+				node: H.e('div', it.starchart.node, 'starchart_sign', deity.sign_icon),
 			};
 			var select, i;
 			
-			function add_atom(z) {
-				r.atoms.push({
-					type: z.type,
-					target: z.target,
-					order: z.order,
-					func: function (x) {
-						return (z.func(x, r))
-					}
-				})
-			}
-			
-			for (i in deity.sign_info.atoms) {
-				if (deity.sign_info.atoms[i].hatred.indexOf(h)!=-1) add_atom(deity.sign_info.atoms[i])
-			}
+			var placement = it.heavens.foresight + 2;
 			
 			Object.defineProperties(r, {
-				active: {
+				placement: {
+					get: function () {
+						return placement
+					},
 					set: function (v) {
-						if (v) {
+						var old = placement;
+						placement = v;
+						if (placement<=1&&(old>1||H.loading_game)) {
+							placement = v;
 							H.add_class(r.node, 'starchart_sign_highlight');
-							H.apply_atoms(r);
-							if (r.apply) r.apply(true);
-						} else {
-							H.remove_class(r.node, 'starchart_sign_highlight');
-							H.remove_atoms(r);
-							if (r.apply) r.apply(false);
+							r.deity.check_active();
+							if (!H.loading_game&&deity.apply) deity.apply(deity, true);			
+						} else if (placement<=0) {
+							it.heavens.remove_sign(r);
+							it.starchart.node.removeChild(r.node);
+							var k = deity.signs.indexOf(r);
+							deity.signs.splice(k,1);	
+							if (deity.apply) deity.apply(deity, false);
+							deity.check_active();							
 						}
 					}
 				},
@@ -124,6 +158,8 @@ it.constructors = {
 				}
 			})
 			
+			if (load&&load.placement) r.placement = load.placement;
+			
 			function click_sign(e) {
 				if (it.deity_chooser.sign == r) {
 					it.deity_chooser.sign = false;
@@ -134,10 +170,12 @@ it.constructors = {
 			
 			r.node.addEventListener('click', click_sign)
 			
+			deity.signs.push(r);
+			
 			return r
 		}
 				
-		tributes = 0, hatred = args.hatred;
+		var tributes = 0, hatred = args.hatred;
 		Object.defineProperties(deity, {
 			tributes: {
 				get: function () {
@@ -158,6 +196,7 @@ it.constructors = {
 				},
 				set: function (v) {
 					hatred = Math.max(0, Math.min(5, v));
+					deity.check_active();
 				}
 			}
 		})
@@ -189,7 +228,7 @@ it.constructors = {
 			},
 			hatred: {
 				get: function () {return deity.hatred},
-				set: function (v) {if (v) deity.hatred = v},
+				set: function (v) {if (typeof(v)=='number') deity.hatred = v},
 				enumerable: true
 			},
 			power: {

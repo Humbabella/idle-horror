@@ -506,7 +506,6 @@ it.starchart = new function () {
 	starchart.node= H.e('div', false, 'starchart')
 	var background = H.e('canvas', starchart.node, 'starchart_backdrop')
 	var canvas = H.e('canvas', starchart.node, 'starchart_canvas')
-	var show_sectors = 7;
 	
 	var radius = it.regions.junction.offsetWidth / 4 - 20;
 	background.width = radius * 2;
@@ -555,15 +554,14 @@ it.starchart = new function () {
 		var brush = canvas.getContext('2d');
 		brush.beginPath();
 		brush.clearRect(0, 0, canvas.width, canvas.height)
-		var aut_arc = (it.clock.aut_length - it.clock.ticks_this_aut) / it.clock.aut_length
 			
 		var i;
-		for (i=0; i<it.heavens.foresight; i++) {
-			if (i<show_sectors&&it.heavens.coming_signs[i]) {
+		for (i in it.heavens.coming_signs) {
+			if (it.heavens.coming_signs[i].placement<it.heavens.foresight) {
 				brush = canvas.getContext('2d');
-				var angle = (Number(i) + aut_arc);
+				var angle = (it.heavens.coming_signs[i].placement);
 				angle *= seventh;
-				var length = ((1 - it.heavens.coming_signs[i].ascension/max) * .7 + .2) * radius
+				var length = ((1 - it.heavens.coming_signs[i].deity.ascension/max) * .7 + .2) * radius
 				var s = {
 					x: Math.sin(angle) * radius * .1 + radius,
 					y: Math.cos(angle) * radius * .1 + radius
@@ -612,46 +610,55 @@ it.heavens = new function () {
 	
 	heavens.id = 'heavens';
 	heavens.node = H.e('div', it.clock.node, 'heavens');
-	heavens.sign_line = H.e('div', heavens.node);
 	heavens.omen_line = H.e('div', heavens.node);
 	heavens.omen_node = H.e('div', it.starchart.node, 'starchart_sign', '!');
 	heavens.omen = {};
+	heavens.next_sign = 0.1;
 	
-	heavens.coming_signs = [false, false, false, false]
+	heavens.coming_signs = []
 	
 	H.add_cvar(heavens, 'foresight', 3)
-	heavens.fill_sky = function () {
-		while (heavens.coming_signs.length < (Number(heavens.foresight)+2)) {
-			var i, a=[], C=10;
-			for (i in it.deities) {
-				if (it.deities[i].awake) {
-					a.push(it.deities[i])
-					C+=it.deities[i].chance
-				}
-			}
-			var r = Math.random() * C;
-			for (i in a) {
-				r -= a[i].chance;
-				if (r<=0) {
-					heavens.coming_signs.push(a[i].get_sign());
-					a[i].ascend();
-					break;
-				}
-			}
-			if (r>0) heavens.coming_signs.push(false);
-		}
-	}
 	function redraw_starchart() {
 		it.starchart.draw_background();
 		it.starchart.draw();
 	}
 	it.cvars.foresight.heavens.update.add_result(redraw_starchart, 999)
-	it.cvars.foresight.heavens.update.add_result(heavens.fill_sky, 999)
 	
 	H.add_cvar(heavens, 'foreboding', 1);
 	H.add_cvar(heavens, 'learnedness', 0);
+		
+	function get_new_sign () {
+		var i, a=[], C=10;
+		for (i in it.deities) {
+			if (it.deities[i].awake) {
+				a.push(it.deities[i]);
+				C+=it.deities[i].chance
+			}
+		}
+		var r = Math.random() * C;
+		for (i in a) {
+			r-= a[i].chance;
+			if (r<=0) {
+				heavens.coming_signs.push(a[i].get_sign());
+				a[i].ascend();
+				break;
+			}
+		}
+		heavens.next_sign = H.r() + 0.5;
+	}
 	
+	heavens.remove_sign = function (s) {
+		var k = heavens.coming_signs.indexOf(s);
+		heavens.coming_signs.splice(s, 1);
+	}
+		
 	function omen_tick() {
+		heavens.next_sign -= it.clock.tick_amount;
+		if (heavens.next_sign<=0) get_new_sign();
+		var i;
+		for (i in heavens.coming_signs) {
+			heavens.coming_signs[i].placement-=it.clock.tick_amount;
+		}
 		heavens.omen.time -= it.clock.tick_amount;
 		if (heavens.omen.time<=0) {
 			if (heavens.omen.state == 'none') {
@@ -732,52 +739,14 @@ it.heavens = new function () {
 	
 	it.each_tick.add_result(omen_tick);
 	
-	var sign = false;
-	Object.defineProperties(heavens, {
-		sign: {
-			get: function () {
-				return sign;
-			},
-			set: function (v) {
-				if (sign) {
-					sign.active = false;
-					heavens.sign_line.innerHTML = '';
-					if (it.deity_chooser.sign = sign) it.deity_chooser.sign = false;
-				}
-				sign = v;
-				if (sign) {				
-					sign.active = true;
-					heavens.sign_line.innerHTML = sign.name;
-				}
-			}
-		}
-	})
-		
 	heavens.show = function () {
 		heavens.sign_line.style.display = 'block';
-	}
-	
-	heavens.get_new_sign = function () {
-		if (heavens.coming_signs[0].node) heavens.coming_signs[0].node.style.display = 'none';
-		heavens.coming_signs.shift();
-		heavens.sign = heavens.coming_signs[0];
-		heavens.fill_sky();
-	}
-	
-	heavens.get_new_sign()
-	
-	it.each_aut.add_result(heavens.get_new_sign)
-	
-	heavens.show_sign_tooltip = function (e) {
-		if (sign) it.tooltip.show(e, sign.tooltip, sign.name);
 	}
 	
 	heavens.show_omen_tooltip = function (e) {
 		if (heavens.omen.state=='active') it.tooltip.show(e, it.omens[heavens.omen.id].description, it.omens[heavens.omen.id].name)
 	}
 	
-	heavens.sign_line.addEventListener('mouseover', heavens.show_sign_tooltip);
-	heavens.sign_line.addEventListener('mouseout', it.tooltip.hide);
 	heavens.omen_line.addEventListener('mouseover', heavens.show_omen_tooltip);
 	heavens.omen_line.addEventListener('mouseout', it.tooltip.hide);
 	
@@ -792,9 +761,7 @@ it.heavens = new function () {
 					if (heavens.coming_signs[i]) {
 						r.push({
 							id: heavens.coming_signs[i].id,
-							used: heavens.coming_signs[i].used,
-							hatred: heavens.coming_signs[i].hatred,
-							power: heavens.coming_signs[i].power
+							placement: heavens.coming_signs[i].placement
 						})
 					}
 					else r.push(false);
@@ -808,7 +775,6 @@ it.heavens = new function () {
 					}
 					else heavens.coming_signs[i] = false;
 				}
-				heavens.sign = heavens.coming_signs[0]
 			},
 			enumerable: true
 		},
@@ -1798,7 +1764,7 @@ it.world_map = new function () {
 		if (args.image) map.image = args.image;
 		else switch (map.type) {
 			case 'land':
-				map.image = 'tile_land_1.png';
+				map.image = 'images/tile_land_1.png';
 				break;
 		}
 
@@ -1871,7 +1837,7 @@ it.resource_table=[];
 for (var i = 0; i<4; i++) {
 	it.resource_table[i] = H.e('table', it.regions.resources, 'resource_table');
 }
-H.add_class(it.resource_table[3], 'warehouse_table');;
+H.add_class(it.resource_table[3], 'warehouse_table');
 
 it.warehouse = new function () {
 	var warehouse = this;
