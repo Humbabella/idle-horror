@@ -826,7 +826,7 @@ data = {
 				it.junction.unlock('heavens');
 				it.techs.agriculture.unlock({by: 'the_stars'});
 				it.works.calendar.unlock();
-				it.deities.mim_ktokh.awake = 1;
+				//it.deities.mim_ktokh.awake = 1;
 			}
 		},
 		grim_feast: {
@@ -902,6 +902,7 @@ data = {
 			cost: {influence: 30},
 			apply: function () {
 				it.techs.theology.unlock({by: 'the_world'});
+				it.acts.expedite.unlock();
 				it.junction.unlock('exploration', 'maps');
 				it.junction.unlock('exploration', 'interests');
 			}
@@ -1671,7 +1672,7 @@ data = {
 				function make_effect_and_love (args) {
 					if (args.sign) {
 						deity_effect_line.innerHTML = '<br>' + args.sign.deity.effect_text;
-						if (args.sign.deity.love_text[args.sign.hatred])deity_love_line.innerHTML = '<br>' + args.sign.deity.love_text[args.sign.hatred];
+						if (args.sign.deity.love_text[args.sign.deity.hatred])deity_love_line.innerHTML = '<br>' + args.sign.deity.love_text[args.sign.deity.hatred];
 					}
 				}
 				it.deity_chooser.draw_sign.add_result(make_effect_and_love);
@@ -2221,14 +2222,14 @@ data = {
 						return x / (1 + it.works.apothecarys.level * it.works.apothecarys.disease_reduction)
 					}
 				},
-				{
+/*				{ RE-ADD WHEN DEITIES ARE FIXED!
 					type: 'village_killing',
 					target: 'red_death',
 					order: 700,
 					func: function (x) {
 						return x / (1 + it.works.apothecarys.level * it.works.apothecarys.red_death_reduction)
 					}
-				}
+				}*/
 			]
 		},
 		armory: {
@@ -2822,20 +2823,20 @@ data = {
 			stature: 0,
 			power: 1,
 			tribute_cost_function: function () {},
+			atoms: [
+				{
+					type: 'gather',
+					target: 'influence',
+					order: 700,
+					func: function (x, me) {return x + 50}
+				}
+			],
 			sign: {
 				name: 'Vacant Sky',
 				icon: '<span class=\'override_color\'>&#9679;<span>',
 				tooltip: '???',
 				description: [
 					'There is an empty space in the sky. The meaning of this is unclear.'
-				],
-				atoms: [
-					{
-						type: 'gather',
-						target: 'influence',
-						order: 700,
-						func: function (x, e) {return x + 50 * e}
-					}
 				]
 			}
 		},
@@ -2866,38 +2867,34 @@ data = {
 				'Yithira is angered. Your farms are useless under his sign.',
 				'Yithira seethes with rage. He not only ruins your farms, but causes the sustenance of your followers to rot before their eyes.'
 			],
-			sign: {
-				name: 'Sign of Yithira',
-				icon: '&#9793;',
-				angle: 3/8*Math.PI,
-				tooltip: 'Fields lie barren before him.',
-				atoms: [
-					{
-						hatred: [0,2,3,4,5],
-						type: 'max',
-						target: 'farm',
-						order: 700,
-						func: function (x, me) {
-							return x * [2, 1, .65, .35, 0, 0][me.hatred];
-							
-						}
-					},
-					{
-						hatred: [0],
-						type: 'farmer_production',
-						target: 'farm',
-						order: 700,
-						func: function (x, me) {return x * 2}
-					},
-					{
-						hatred: [5],
-						type: 'tick',
-						target: 'food',
-						order: 990,
-						func: function (x, me) {return x * .75 - 200}
+			atoms: [
+				{
+					hatred: [0,2,3,4,5],
+					type: 'max',
+					target: 'farm',
+					order: 700,
+					func: function (x, me) {
+						return x * [2, 1, .65, .35, 0, 0][me.hatred];	
 					}
-				]
-			}
+				},
+				{
+					hatred: [0],
+					type: 'farmer_production',
+					target: 'farmer',
+					order: 700,
+					func: function (x, me) {return x * 2}
+				},
+				{
+					hatred: [5],
+					type: 'tick',
+					target: 'food',
+					order: 990,
+					func: function (x, me) {return x * .75 - 200}
+				}
+			],
+			sign_name: 'Sign of Yithira',
+			sign_icon: '&#9793;',
+			sign_tooltip: 'Fields lie barren before him.'
 		},
 		red_death: {
 			object_type: 'deity',
@@ -2928,35 +2925,32 @@ data = {
 				false,
 				'Perhaps you angered the Red Death or perhaps that makes no sense. Whatever the cause, under the Scarlet Moon your followers are doomed.'
 			],
-			sign: {
-				name: 'The Scarlet Moon',
-				icon: '&#9790',
-				angle: 29/16*Math.PI,
-				tooltip: 'All things must end.',
-				atoms: [
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'disease',
-						target: 'humans',
-						order: 700,
-						func: function (x, me) {return x * [1.3, 1.8, 2.2, 3, 5, 15][me.hatred]}
-					},
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'max',
-						target: 'humans_counter_disease',
-						order: 700,
-						func: function (x, me) {return x * [1, 1.3, 1.5, 1.8, 2, 2.5][me.hatred]}
-					},
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'prosperity',
-						target: 'village',
-						order: 400,
-						func: function (x, me) {return x - it.deities.red_death.village_killing}
-					}
-				]
-			}
+			sign_name: 'The Scarlet Moon',
+			sign_icon: '&#9790',
+			sign_tooltip: 'All things must end.',
+			atoms: [
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'disease',
+					target: 'humans',
+					order: 700,
+					func: function (x, me) {return x * [1.3, 1.8, 2.2, 3, 5, 15][me.hatred]}
+				},
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'max',
+					target: 'humans_counter_disease',
+					order: 700,
+					func: function (x, me) {return x * [1, 1.3, 1.5, 1.8, 2, 2.5][me.hatred]}
+				},
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'prosperity',
+					target: 'village',
+					order: 400,
+					func: function (x, me) {return x - it.deities.red_death.village_killing}
+				}
+			]
 		},
 		mim_ktokh: {
 			object_type: 'deity',
@@ -2985,21 +2979,18 @@ data = {
 				'Mim\'Ktokh thinks of you often. The Epochs under her sign stretch out even further.',
 				'Mim\'Ktokh is watching. The Epochs under her sign are maddening.'
 			],
-			sign: {
-				name: 'Sign of Mim\'Ktokh',
-				icon: '&#9728;',
-				angle: 15/16*Math.PI,
-				tooltip: 'Time stretches out before her.',
-				atoms: [
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'dilation',
-						target: 'clock',
-						order: 700,
-						func: function (x, me) {return x * [1.2, 2, 3, 4, 6, 12][me.hatred]}
-					}
-				]
-			}
+			sign_name: 'Sign of Mim\'Ktokh',
+			sign_icon: '&#9728;',
+			sign_tooltip: 'Time stretches out before her.',
+			atoms: [
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'dilation',
+					target: 'clock',
+					order: 700,
+					func: function (x, me) {return x * [1.2, 2, 3, 4, 6, 12][me.hatred]}
+				}
+			]
 		},
 		princess: {
 			object_type: 'deity',
@@ -3028,31 +3019,28 @@ data = {
 				'The Princess in Yellow dislikes you and steals influence from you under her moon.',
 				'The Princess in Yellow despises you, and uses all her effort to reduce your influence under her moon.'
 			],
-			sign: {
-				name: 'Pallid Moon',
-				icon: '&#9789;',
-				angle: 13/16*Math.PI,
-				tooltip: 'All bow to her.',
-				atoms: [
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'influence_gain',
-						target: 'humans',
-						order: 700,
-						func: function (x, me) {return x * [2, 1, .5, 0, 0, 0][me.hatred]}
-					},
-					{
-						hatred: [4, 5],
-						type: 'decay',
-						target: 'influence',
-						order: 700,
-						func: function (x, me) {
-							var f = (me.hatred == 4 ? 1 : 3)
-							return (x + f)/(f+1)
-						}
+			sign_name: 'Pallid Moon',
+			sign_icon: '&#9789;',
+			sign_tooltip: 'All bow to her.',
+			atoms: [
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'influence_gain',
+					target: 'humans',
+					order: 700,
+					func: function (x, me) {return x * [2, 1, .5, 0, 0, 0][me.hatred]}
+				},
+				{
+					hatred: [4, 5],
+					type: 'decay',
+					target: 'influence',
+					order: 700,
+					func: function (x, me) {
+						var f = (me.hatred == 4 ? 1 : 3)
+						return (x + f)/(f+1)
 					}
-				]
-			}
+				}
+			]
 		},
 		tsatha: {
 			object_type: 'deity',
@@ -3081,24 +3069,24 @@ data = {
 				'Tsatha focuses it\'s hunger on your followers. Your researchers can discover nothing under the Sign of Tsatha.',
 				'Tsatha seeks revenge. Not only can you complete no new research under the Sign of Tsatha, but Tsatha consumes some of the research you have already done.'
 			],
-			sign: {
-				name: 'Sign of Tsatha',
-				icon: '&#9799;',
-				angle: 17/16*Math.PI,
-				tooltip: 'Only madness in its sight.',
-				apply: function () {
-					it.dosh.research.value -= 10
-				},
-				atoms: [
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'effect',
-						target: 'research',
-						order: 700,
-						func: function (x, me) {return x * [3, 1.5, 1, .2, 0, 0][me.hatred]}
-					}
-				]
-			}
+			sign_name: 'Sign of Tsatha',
+			sign_icon: '&#9799;',
+			sign_tooltip: 'Only madness in its sight.',
+			apply: function (me, s) {
+				if (s&&me.hatred==5) {
+					it.dosh.research.value -= 10;
+					if (it.dosh.research.value<0) it.dosh.research.value = 0;
+				}
+			},
+			atoms: [
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'effect',
+					target: 'research',
+					order: 700,
+					func: function (x, me) {return x * [3, 1.5, 1, .2, 0, 0][me.hatred]}
+				}
+			]
 		},
 		ukreyhu: {
 			object_type: 'deity',
@@ -3126,35 +3114,32 @@ data = {
 				'Ukreyhu is angered. He demands even more from your followers, leaving them with no time for their regular tasks.',
 				'Ukreyhu seethes with rage. He causes your followers to celebrate all day and night, leaving no time for work and causing exhaustion.'
 			],
-			sign: {
-				name: 'Sign of Ukreyhu',
-				icon: '&#9809;',
-				angle: 0,
-				tooltip: 'The revels are endless before him.',
-				atoms: [
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'labour_effect',
-						target: 'labourer',
-						order: 700,
-						func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
-					},
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'fabrications_effect',
-						target: 'manufacturer',
-						order: 700,
-						func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
-					},
-					{
-						hatred: [5],
-						type: 'exhaustion',
-						target: 'humans',
-						order: 400,
-						func: function (x, me) {return x + Math.max(10, it.species.humans.value)}
-					}
-				]
-			}
+			sign_name: 'Sign of Ukreyhu',
+			sign_icon: '&#9809;',
+			sign_tooltip: 'The revels are endless before him.',
+			atoms: [
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'labour_effect',
+					target: 'labourer',
+					order: 700,
+					func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
+				},
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'fabrications_effect',
+					target: 'manufacturer',
+					order: 700,
+					func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
+				},
+				{
+					hatred: [5],
+					type: 'exhaustion',
+					target: 'humans',
+					order: 400,
+					func: function (x, me) {return x + Math.max(10, it.species.humans.value)}
+				}
+			]
 		},
 		hisessifsiths: {
 			object_type: 'deity',
@@ -3182,21 +3167,18 @@ data = {
 				'Hisessifsiths is angered. She ensures your followers have no spare thoughts to generate ingenuity.',
 				'Hisessifsiths seethes with rage. She absorbs all of your follower\'s best ideas.'
 			],
-			sign: {
-				name: 'Sign of Hisessifsiths',
-				icon: '&#9796;',
-				angle: 11/8*Math.PI,
-				tooltip: 'The mind dulls before her.',
-				atoms: [
-					{
-						hatred: [0,1,2,3,4,5],
-						type: 'knowledge_effect',
-						target: 'contemplative',
-						order: 700,
-						func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
-					}
-				]
-			}
+			sign_name: 'Sign of Hisessifsiths',
+			sign_icon: '&#9796;',
+			sign_tooltip: 'The mind dulls before her.',
+			atoms: [
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'knowledge_effect',
+					target: 'contemplative',
+					order: 700,
+					func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
+				}
+			]
 		},
 		ruins: {
 			object_type: 'interest',
@@ -3842,6 +3824,7 @@ data = {
 				it.add_button_animation(me.ui_lines.pay_tribute);
 				
 				me.ui_lines.tribute_cost.update = function () {
+					if (!it.world_map.selected_interest||it.world_map.selected_interest.deity) return;
 					var d = it.deities[it.world_map.selected_interest.deity];
 					me.ui_lines.name_line.innerHTML = 'Shrine to ' + d.name;
 					var c = it.dosh.consider(d.tribute_cost);
