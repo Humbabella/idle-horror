@@ -119,7 +119,7 @@ it.construct_tab = function (args) {
 		
 		add_node: function (new_element, need_update, section) {
 			if (need_update) tab.updates.push(new_element);
-			if (section) tab.sections[section].node.appendChild(new_element.node);
+			if (section) tab.sections[section].node.body.appendChild(new_element.node);
 			else tab.node.appendChild(new_element.node)
 		},
 		
@@ -165,10 +165,22 @@ it.section = function (args, tab) {
 		show: function () {
 			section.node.style.display = 'block';
 			section.shown = 1;
-		}
+		},
+		
+		toggle_collapse: function () {
+			section.collapsed = !section.collapsed;
+			section.node.body.style.display = section.collapsed ? 'none' : 'block';
+			section.node.collapse_button.innerHTML = section.collapsed ? '+' : '-';
+		},
+		
+		collapsed: false
 	}
 	
 	section.node.heading = H.e('div', section.node, 'section_header', section.name);
+	section.node.body = H.e('div', section.node);
+	section.node.collapse_button = H.e('div', section.node.heading, 'section_button', '-');
+	
+	section.node.collapse_button.addEventListener('click', section.toggle_collapse);
 	
 	if (args.show) section.show();
 	
