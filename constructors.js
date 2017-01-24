@@ -663,6 +663,7 @@ it.constructors = {
 				}
 			}
 			if (args.unlock) {
+				it.junction.unlock(tech.show_in.tab, tech.show_in.section);
 				tech.unlocked = args.aut || it.clock.aut;
 				tech.node.style.display = 'block';
 				it.research.update_tech_costs();

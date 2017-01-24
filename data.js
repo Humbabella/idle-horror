@@ -69,13 +69,20 @@ data = {
 					show: true
 				},
 				{
-					id: 'civilization',
-					name: 'Civilization',
-					show: true
+					id: 'technology',
+					name: 'Technology'
 				},
 				{
-					id: 'library',
-					name: 'Library'
+					id: 'society',
+					name: 'Society'
+				},
+				{
+					id: 'religion',
+					name: 'Religion'
+				},
+				{
+					id: 'science',
+					name: 'Science'
 				},
 				{
 					id: 'improvements',
@@ -94,10 +101,6 @@ data = {
 				{
 					id: 'buildings',
 					name: 'Buildings'
-				},
-				{
-					id: 'library',
-					name: 'Library'
 				},
 				{
 					id: 'monuments',
@@ -1177,7 +1180,7 @@ data = {
 			locks: 1,
 			description: 'Use of simple tools.',
 			announce: 'You can assign your followers to be manufacturers who create fabrications.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: .5,
 			fixed_cost: {labour: 5},
 			no_knowledge: 1,
@@ -1193,7 +1196,7 @@ data = {
 			locks: 1,
 			description: 'Traditions that outlive indiviudals.',
 			announce: 'Your followers can now improve their tasks over time. The top two tasks you assign your followers to will develop traditions.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
 			fixed_cost: {influence: 15},
 			no_knowledge: .75,
@@ -1223,7 +1226,7 @@ data = {
 			locks: 1,
 			description: 'The creation of structures.',
 			announce: 'Your followers can create hovels and sheds.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			fixed_cost: {labour: 5, fabrications: 5},
 			no_knowledge: .8,
@@ -1241,7 +1244,7 @@ data = {
 			locks: 1,
 			description: 'Various techniques to preserve food for future use.',
 			announce: 'Your followers can use storage buildings as granaries to store additional food.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: .8,
 			fixed_cost: {labour: 5, food: 10},
 			no_knowledge: 1,
@@ -1256,7 +1259,7 @@ data = {
 			locks: 1,
 			description: 'The recording of events and ideas with simple pigments.',
 			announce: 'You can assign your followers to be contemplatives who generate ingenuity',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: .8,
 			fixed_cost: {influence: 20},
 			no_knowledge: 1,
@@ -1275,7 +1278,7 @@ data = {
 			description: 'Pictograms codify the recording of information, allowing it to be better stored.',
 			announce: 'Your followers can create archives to increase storage of knowledge.',
 			time_factor: 1.5,
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			fixed_cost: {influence: 20, knowledge: 5},
 			no_knowledge: 1,
 			apply: function () {
@@ -1290,7 +1293,7 @@ data = {
 			locks: 1,
 			description: 'A flawed beginning of an understanding of the world.',
 			announce: 'Your worshippers can construct idols to gather influence more quickly.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'religion'},
 			time_factor: 1,
 			cost_factor: {influence: 100},
 			apply: function () {
@@ -1306,7 +1309,7 @@ data = {
 			locks: 1,
 			description: 'Worshipping of objects in place of abstract concepts.',
 			announce: 'Your worshippers can be directed towards works and visions.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'religion'},
 			time_factor: 1,
 			cost_factor: {influence: 100},
 			apply: function () {
@@ -1320,7 +1323,7 @@ data = {
 			locks: 1,
 			description: 'A device with virtually unlimited uses.',
 			announce: 'Your labourers are far more efficient.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 100},
 			fixed_cost: {fabrications: 5},
@@ -1345,7 +1348,7 @@ data = {
 			locks: 1,
 			description: 'The knowledge of how to create and control fire.',
 			announce: 'Your followers can create fires to keep warm.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: .75,
 			fixed_cost: {labour: 5, fabrications: 5},
 			no_knowledge: 1,
@@ -1361,7 +1364,7 @@ data = {
 			locks: 1,
 			description: 'Preparation of food using fire.',
 			announce: 'Your followers can make food go further and require less to survive.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 100},
 			fixed_cost: {fabrications: 5, food: 5},
@@ -1384,7 +1387,7 @@ data = {
 			locks: 1,
 			description: 'An improved method of killing.',
 			announce: 'Your followers can build an armory which increases the sustenance produced by hunters.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 150},
 			fixed_cost: {fabrications: 10},
@@ -1408,7 +1411,7 @@ data = {
 			locks: 1,
 			description: 'Trapping allows your followers to catch beasts to use for sustenance.',
 			announce: 'Your followers can set traps for herds of beasts, converting labour into sustenance.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 100},
 			fixed_cost: {fabrications: 20, food: 10},
@@ -1454,7 +1457,7 @@ data = {
 			locks: 1,
 			description: 'An understanding of the meaning of the various star signs and moons.',
 			announce: 'You can now read descriptions of the deities by clicking on their starsigns on the starchart. Your followers can build an oracle that allows them to see further into the future.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'religion'},
 			time_factor: 1,
 			type: 'civilization',
 			cost_factor: {influence: 100},
@@ -1490,7 +1493,7 @@ data = {
 			locks: 1,
 			description: 'Traditions for burying the dead.',
 			announce: 'Your followers can build graves to store corpses.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'religion'},
 			time_factor: 1,
 			cost_factor: {labour: 100, fabrications: 100},
 			fixed_cost: {corpses: 2},
@@ -1505,7 +1508,7 @@ data = {
 			locks: 1,
 			description: 'The growth of crops for a more stable food supply.',
 			announce: 'Your followers can now create farms and become farmers to produce sustenance at regular intervals.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 100},
 			fixed_cost: {food: 10},
@@ -1523,7 +1526,7 @@ data = {
 			locks: 1,
 			description: 'Trial and error that produces cures for some ailments.',
 			announce: 'Your followers can now build an apothecary\'s to reduce the impact of disease.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 0.8,
 			cost_factor: {labour: 30, knowledge: 15},
 			apply: function () {
@@ -1536,7 +1539,7 @@ data = {
 			locks: 2,
 			description: 'System for delivering water to crops.',
 			announce: 'Engineering now improves the maximum food for each farm.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 100},
 			fixed_cost: {fabrications: 50},
@@ -1558,7 +1561,7 @@ data = {
 			locks: 1,
 			description: 'A device that makes exploration much easier.',
 			announce: 'Time between launching expeditions is greatly reduced.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 0.7,
 			cost_factor: {labour: 100},
 			atoms: [
@@ -1577,7 +1580,7 @@ data = {
 			locks: 1,
 			description: 'Sailing enables further exploration.',
 			announce: 'Your followers can build boats that are required for advanced expeditions.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1/2,
 			cost_factor: {labour: 75, knowledge: 15},
 			apply: function () {
@@ -1591,7 +1594,7 @@ data = {
 			locks: 1,
 			description: 'An improved system for storing information.',
 			announce: 'Your followers can develop a number of new sciences.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
 			fixed_cost: {knowledge: 100},
 			no_knowledge: 1,
@@ -1608,7 +1611,7 @@ data = {
 			locks: 2,
 			description: 'Techniques for contructing better structures.',
 			announce: 'Your followers can build warehouses which hold even more goods.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1.5,
 			cost_factor: {labour: 100, fabrications: 100},
 			fixed_cost: {fabrications: 50},
@@ -1624,7 +1627,7 @@ data = {
 			locks: 2,
 			description: 'Smelting and working with metals to make better tools.',
 			announce: 'Your followers can create a smelter which allows manufacturers to produce fabrications at an increase rate, but consume components.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 50, fabrications: 100, knowledge: 5},
 			fixed_cost: {ore: 5},
@@ -1641,7 +1644,7 @@ data = {
 			locks: 2,
 			description: 'Drawing materials from the earth.',
 			announce: 'Your followers can become miners, who very quickly gather resources from explored regions.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 200},
 			fixed_cost: {ore: 1},
@@ -1667,7 +1670,7 @@ data = {
 			locks: 2,
 			description: 'A theory of gods.',
 			announce: 'You followers theorize about the existence of other gods connected with the stars.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'religion'},
 			time_factor: 1,
 			cost_factor: {influence: 50, knowledge: 35},
 			apply: function () {
@@ -1701,7 +1704,7 @@ data = {
 			locks: 1,
 			description: 'Domestication of animals to serve your followers.',
 			announce: 'Your followers can now build animal pens which allow the capture of Beasts that generate and store labour but utilize food.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 100, food: 20},
 			apply: function () {
@@ -1717,7 +1720,7 @@ data = {
 			locks: 1,
 			description: 'Riding beasts to explore more quickly.',
 			announce: 'Your followers can now create mounts to bring on expeditions. If an expedition is launched and a mount is available then the time the expedition takes will be reduced.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 0.5,
 			cost_factor: {labour: 60, food: 20, knowledge: 5},
 			apply: function () {
@@ -1739,7 +1742,7 @@ data = {
 			locks: 2,
 			description: 'A device to help till soil. Especially effective with beasts.',
 			announce: 'You can now assign multiple beasts to assist with farming.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 0.5,
 			cost_factor: {labour: 80},
 			atoms: [
@@ -1759,7 +1762,7 @@ data = {
 			locks: 1,
 			description: 'The ability to forge iron, a more durable material than bronze.',
 			announce: 'Your followers can construct an ironworks which increases the effectiveness of smelters.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1.5,
 			cost_factor: {labour: 100, fabrications: 100},
 			apply: function () {
@@ -1773,7 +1776,7 @@ data = {
 			locks: 2,
 			description: 'Exchanging goods and ideas with others.',
 			announce: 'Exploring can locate villages, which increase research rate by the helpful exchange of ideas.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
 			cost_factor: {knowledge: 15},
 			apply: function () {
@@ -1789,7 +1792,7 @@ data = {
 			locks: 1,
 			description: 'Organization of people to assist in governance.',
 			announce: 'Your followers can now infiltrate settlements to manipulate and exploit them.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
 			cost_factor: {knowledge: 10},
 			fixed_cost: {influence: 100},
@@ -1858,7 +1861,7 @@ data = {
 			locks: 1,
 			description: 'Searching for ancient truths.',
 			announce: 'You may now send archaeological expeditions to sites of interest.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
 			cost_factor: {labour: 50, knowledge: 10},
 			fixed_cost: {foreboding: 5},
@@ -1873,7 +1876,7 @@ data = {
 			locks: 2,
 			description: 'A universal symbol of value.',
 			announce: 'Your merchants can now trade resources for currency which can be spent in place of other common resources for works.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
 			cost_factor: {labour: 100, knowledge: 25},
 			fixed_cost: {rarities: 1},
@@ -1921,7 +1924,7 @@ data = {
 			locks: 1,
 			description: 'Lenses to assist those who have difficulty seeing.',
 			announce: 'You are able to efficiently assign more followers to tasks.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 0.5,
 			cost_factor: {labour: 50},
 			fixed_cost: {rarities: 5},
@@ -1941,7 +1944,7 @@ data = {
 			locks: 1,
 			description: 'A transparent material useful in construction and storage.',
 			announce: 'Homes your followers build are less inadequate.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 0.5,
 			cost_factor: {labour: 40, fabrications: 15, ore: 1},
 			atoms: [
@@ -1963,7 +1966,7 @@ data = {
 			locks: 1,
 			description: 'Guilds systematize professions to better pass on professional knowledge to new generations.',
 			announce: 'You can now build an academy that will increase the rate at which your occupations improve.',
-			show_in: {tab: 'research', section: 'civilization'},
+			show_in: {tab: 'research', section: 'society'},
 			time_factor: 0.8,
 			cost_factor: {knowledge: 10, labour: 50},
 			apply: function () {
@@ -1977,7 +1980,7 @@ data = {
 			locks: 1,
 			description: 'The study of animals including their structure, classification and reproduction.',
 			announce: 'If your followers have two or more beasts at the end of an epoch, they will breed another.',
-			show_in: {tab: 'research', section: 'library'},
+			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 0.8,
 			cost_factor: {knowledge: 10, labour: 50},
 			fixed_cost: {beasts: 1},
@@ -2561,7 +2564,7 @@ data = {
 			object_type: 'improvement',
 			name: 'Cartography',
 			description: 'Allows additional lands to be explored.',
-			show_in: {tab: 'research', section: 'library'},
+			show_in: {tab: 'research', section: 'science'},
 			locks: 1,
 			time_function: function (me) {
 				return (me.level+1) * Math.pow(1.1, me.level);
@@ -2591,7 +2594,7 @@ data = {
 			object_type: 'improvement',
 			name: 'Drama and Poetry',
 			description: 'Works that influence thoughts and feelings.<br>Increases the rate at which new followers arrive.',
-			show_in: {tab: 'research', section: 'library'},
+			show_in: {tab: 'research', section: 'science'},
 			locks: 1,
 			time_function: function (me) {
 				return 5 * (me.level + 1) * Math.pow(1.3, me.level)
@@ -2621,7 +2624,7 @@ data = {
 			name: 'Encyclopedia',
 			locks: 1,
 			description: 'Compendia of all-around knowledge.<br>These can be spent in place of ingenuity to reasearch new technologies.',
-			show_in: {tab: 'research', section: 'library'},
+			show_in: {tab: 'research', section: 'science'},
 			time_function: function (me) {
 				return 5 * (me.level + 1);
 			},
@@ -2642,7 +2645,7 @@ data = {
 			name: 'Engineering',
 			locks: 2,
 			description: 'Producing physical solutions to real world problems.<br>The use of cranes allows easier construction of housing and storage buildings.',
-			show_in: {tab: 'research', section: 'library'},
+			show_in: {tab: 'research', section: 'science'},
 			time_function: function (me) {
 				return Math.max(1, 3 * me.level) * Math.pow(1.3, me.level)
 			},
@@ -2673,7 +2676,7 @@ data = {
 			name: 'Optics',
 			locks: 1,
 			description: 'The study of light and lensmaking. Applications include better scouting when exploring.',
-			show_in: {tab: 'research', section: 'library'},
+			show_in: {tab: 'research', section: 'science'},
 			time_function: function (me) {
 				return 2 * (me.level + 1) * Math.pow(1.3, me.level)
 			},
@@ -2858,10 +2861,11 @@ data = {
 			stature: 1,
 			power: 1,
 			tribute_cost_function: function (x) {
+				var z = Math.pow(x+1, 2) * (1 + x * .5);
 				return {
-					labour: Math.min(5, x+1) * 100,
-					fabrications: 100 * (1 + x/2) * Math.pow(1.3, x),
-					food: 40 * (1 + x/2) * Math.pow(1.3, x)
+					labour: 100 * z,
+					fabrications: 100 * z,
+					food: 40 * z
 				}
 			},
 			description: [
@@ -2916,10 +2920,11 @@ data = {
 			stature: 0.5,
 			power: 2,
 			tribute_cost_function: function (x) {
+				var z = Math.pow(x+1, 2) * (1 + x * .5);
 				return {
-					labour: Math.min(5, x+1) * 100,
-					fabrications: 100 * (1 + x/2) * Math.pow(1.3, x),
-					humans: 6 * (1 + x/2) * Math.pow(1.3, x)
+					labour: 100 * z,
+					fabrications: 100 * z,
+					humans: 4 * z
 				}
 			},
 			description: [
@@ -2970,10 +2975,11 @@ data = {
 			stature: 1/3,
 			power: 3,
 			tribute_cost_function: function (x) {
+				var z = Math.pow(x+1, 2) * (1 + x * .5);
 				return {
-					labour: Math.min(5, x+1) * 100,
-					fabrications: 100 * (1 + x/2) * Math.pow(1.3, x),
-					lost_epochs: 5 * (1 + x) * Math.pow(2, x)
+					labour: 100 * z,
+					fabrications: 100 * z,
+					lost_epochs: 10 * z
 				}
 			},
 			description: [
@@ -3010,10 +3016,11 @@ data = {
 			stature: 1/2,
 			power: 2,
 			tribute_cost_function: function (x) {
+				var z = Math.pow(x+1, 2) * (1 + x * .5);
 				return {
-					labour: Math.min(5, x+1) * 100,
-					fabrications: 100 * (1 + x/2) * Math.pow(1.3, x),
-					influence: 100 * (1 + x/2) * Math.pow(1.3, x)
+					labour: 100 * z,
+					fabrications: 100 * z,
+					influence: 100 * z
 				}
 			},
 			description: [
@@ -3060,10 +3067,11 @@ data = {
 			stature: 2,
 			power: 0.5,
 			tribute_cost_function: function (x) {
+				var z = Math.pow(x+1, 2) * (1 + x * .5);
 				return {
-					labour: Math.min(5, x+1) * 100,
-					fabrications: 100 * (1 + x/2) * Math.pow(1.3, x),
-					research: 3 * (1 + x) * Math.pow(2, x)
+					labour: 100 * z,
+					fabrications: 100 * z,
+					research: 2 * z
 				}
 			},
 			description: [
@@ -3106,9 +3114,10 @@ data = {
 			stature: 2,
 			power: 0.5,
 			tribute_cost_function: function (x) {
+				var z = Math.pow(x+1, 2) * (1 + x * .5);
 				return {
-					labour: Math.min(5, x+1) * 100,
-					fabrications: 100 * (1 + x/2) * Math.pow(1.3, x)
+					labour: 100 * z,
+					fabrications: 100 * z,
 				}
 			},
 			description: [
@@ -3159,9 +3168,10 @@ data = {
 			stature: 2,
 			power: 0.5,
 			tribute_cost_function: function (x) {
+				var z = Math.pow(x+1, 2) * (1 + x * .5);
 				return {
-					labour: Math.min(5, x+1) * 100,
-					fabrications: 100 * (1 + x/2) * Math.pow(1.3, x)
+					labour: 100 * z,
+					fabrications: 100 * z,
 				}
 			},
 			description: [
@@ -3869,6 +3879,5 @@ data = {
 			unselect: function () {}
 		}
 	}
-
-	
+	
 }

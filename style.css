@@ -109,7 +109,8 @@ body {background-color: #666}
 .tab_body{margin: 2px}
 
 .section{margin-bottom: 15px; display: none}
-.section_header{font-weight: bold; border-bottom: 1px solid #000; margin-bottom: 3px}
+.section_header{position: relative; font-weight: bold; border-bottom: 1px solid #000; margin-bottom: 3px}
+.section_collapse_button{position: absolute; right: 0px; top: 0px;}
 
 .resource_table{margin-bottom: 20px}
 .warehouse_table{display: none}
