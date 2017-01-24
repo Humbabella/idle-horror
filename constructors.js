@@ -1,4 +1,4 @@
-it.constructors = {//
+it.constructors = {
 	
 	sub_log: function (args, id) {
 		var i, sub_log = {
