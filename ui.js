@@ -1,4 +1,4 @@
-it.regions = {
+it.regions = { //
 	junction: document.getElementById('left_column'),
 	resources: document.getElementById('middle_column'),
 	log: document.getElementById('right_column')
