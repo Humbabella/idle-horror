@@ -519,6 +519,7 @@ it.constructors = {
 		ui.bar = H.e('td', 0, 'node_button node_button_wide');
 		ui.fill = H.e('div', ui.bar, 'node_button_fill');
 		ui.button_text = H.e('div', ui.bar, 'node_button_text', 'Impart Knowledge');
+		//if (tech.tradition) ui.tradition = H.e('div', 0, 'node_line', it.jobs[tech.tradition].name + ' Tradition');
 		ui.cost = H.e('div', 0, 'node_line')
 		ui.time = H.e('div', 0, 'node_line')
 		ui.desc = H.e('div', 0, 'node_line', tech.description);
@@ -529,6 +530,7 @@ it.constructors = {
 		
 		tech.ui.add(ui.name, 'heading');
 		tech.ui.add(ui.bar, 'heading');
+		//if (tech.tradition) tech.ui.add(ui.tradition, 'heading');
 		tech.ui.add(ui.cost);
 		tech.ui.add(ui.desc);
 		
@@ -629,6 +631,7 @@ it.constructors = {
 			it.each_tick.remove_result(tick);
 			it.research.stop_researching();
 			acquire();
+			//if (tech.tradition) tech.tradition.enable();
 		}
 		
 		function tick () {
@@ -662,7 +665,6 @@ it.constructors = {
 			if (args.unlock) {
 				tech.unlocked = args.aut || it.clock.aut;
 				tech.node.style.display = 'block';
-				it.junction.unlock(tech.show_in.tab, tech.show_in.section);
 				it.research.update_tech_costs();
 			}		
 		}
