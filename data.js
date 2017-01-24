@@ -179,13 +179,7 @@ data = {
 						return x + me.count * me.influence_effect
 					}
 				}
-			],
-			levels: {
-				1: function (me, report) {
-					it.schemes.scheme_idolatry.unlock();
-					return report + ' They develop a new scheme: Idolatry.';
-				}
-			}
+			]
 		},
 		hunter: {
 			object_type: 'job',
@@ -193,7 +187,7 @@ data = {
 			tooltip: function (me) {
 				return 'Generates ' + me.food_effect + ' sustenance per Epoch.'
 			},
-			generates: {food: 240}
+			generates: {food: 200}
 		},
 		farmer: {
 			object_type: 'job',
@@ -273,7 +267,7 @@ data = {
 			default_job: 'worshipper',
 			jobs: {
 				worshipper: {priority: true, base_efficiency: 5},
-				hunter: {priority: true, base_efficiency: 5},
+				hunter: {priority: true, base_efficiency: 12},
 				farmer: {priority: true, base_efficiency: 5},
 				labourer: {base_efficiency: 5},
 				manufacturer: {base_efficiency: 5},
@@ -1305,6 +1299,20 @@ data = {
 			},
 			unlocks: ['burial', 'astrology']
 		},
+		idolatry: {
+			object_type: 'tech',
+			name: 'Idolatry',
+			age: 1,
+			locks: 1,
+			description: 'Worshipping of objects in place of abstract concepts.',
+			announce: 'Your worshippers can be directed towards works and visions.',
+			show_in: {tab: 'research', section: 'civilization'},
+			time_factor: 1,
+			cost_factor: {influence: 100},
+			apply: function () {
+				it.schemes.scheme_idolatry.unlock();
+			}
+		},
 		wheel: {
 			object_type: 'tech',
 			name: 'The Wheel',
@@ -2222,14 +2230,14 @@ data = {
 						return x / (1 + it.works.apothecarys.level * it.works.apothecarys.disease_reduction)
 					}
 				},
-/*				{ RE-ADD WHEN DEITIES ARE FIXED!
+				{
 					type: 'village_killing',
 					target: 'red_death',
 					order: 700,
 					func: function (x) {
 						return x / (1 + it.works.apothecarys.level * it.works.apothecarys.red_death_reduction)
 					}
-				}*/
+				}
 			]
 		},
 		armory: {
@@ -2326,8 +2334,11 @@ data = {
 				name: 'Icons'
 			},
 			apply: function (me) {
-				if (me.level>=2) {
+				if (me.level>=1) {
 					it.visions.babbling.unlock();
+				}
+				if (me.level>=2) {
+					it.techs.idolatry.unlock({by: 'icon'});
 				}
 				it.deities.princess.awake=1;
 			},
@@ -3568,6 +3579,7 @@ data = {
 			name: 'Description',
 			unlocked: 1,
 			select: function (me, value) {
+				me.ui.clear();
 				me.ui_lines.name.innerHTML = '<b>' + value.name + '</b>' + (value.expired ? ' (Expired)' : '');
 				var i;
 				for (i in value.desc_lines) {
@@ -3575,9 +3587,6 @@ data = {
 				}
 			},
 			unselect: function (me, value) {
-				for (i in value.desc_lines) {
-					me.ui.remove(value.desc_lines[i])
-				}
 			}
 		},
 		governance_console: {
@@ -3823,8 +3832,8 @@ data = {
 				
 				it.add_button_animation(me.ui_lines.pay_tribute);
 				
-				me.ui_lines.tribute_cost.update = function () {
-					if (!it.world_map.selected_interest||it.world_map.selected_interest.deity) return;
+				me.ui_lines.tribute_cost.update = function (target_deity) {
+					if (!it.world_map.selected_interest||!it.world_map.selected_interest.deity) return;
 					var d = it.deities[it.world_map.selected_interest.deity];
 					me.ui_lines.name_line.innerHTML = 'Shrine to ' + d.name;
 					var c = it.dosh.consider(d.tribute_cost);
@@ -3855,9 +3864,11 @@ data = {
 				
 				me.ui_lines.pay_tribute.addEventListener('click', tribute);
 			},
-			select: function () {},
+			select: function (me, value) {
+			},
 			unselect: function () {}
 		}
 	}
 
+	
 }

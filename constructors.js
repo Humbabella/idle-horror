@@ -1218,11 +1218,7 @@ it.constructors = {
 		}
 		
 		ui.cost.update = function () {
-			if (work.installments==1) {
-				ui.cost.innerHTML = it.dosh.consider(work.cost).format
-			} else {
-				ui.cost.innerHTML = 'Next installment: ' + it.dosh.consider(work.cost).format
-			}
+			ui.cost.innerHTML = it.dosh.consider(work.cost).format
 		}
 		
 		if (typeof(work.description)=='function') {

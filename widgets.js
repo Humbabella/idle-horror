@@ -228,8 +228,14 @@ Object.defineProperties(it.dosh, {
 				}
 			}
 			
-			if (format.length>0) format = format.substring(0, format.length - 2);
+			if (format.length>0) {
+				format = format.substring(0, format.length - 2);
+				if (cost_object.installments&&cost_object.installments.max>1) {
+					format += ' (Part ' + (cost_object.installments.made + 1) + '/' + cost_object.installments.max + ')';
+				}
+			}
 			else format = 'Nothing';
+			
 			
 			function cant_pay_result() {
 				return {
@@ -308,6 +314,9 @@ Object.defineProperties(it.dosh, {
 			}
 			
 			format_s = format_s.substring(0, format_s. length - 2)
+			if (cost_object.installments&&cost_object.installments.max>1) {
+				format_s += ' (Part ' + (cost_object.installments.made + 1) + '/' + cost_object.installments.max + ')';
+			}
 			
 			result = {
 				format: format_s,
