@@ -28,7 +28,9 @@ body {background-color: #666}
 .sign_line{display: none}
 
 .job_holder{width: 100%; display: none; position: relative; min-height: 24px}
-.job_name{position: relative; padding-top: 3px; width: 80%}
+.job_name{position: relative; display: inline; padding-top: 3px; width: 100px}
+.job_count{display: inline}
+.job_max{display: inline}
 .job_plus_button{position: absolute; border: 1px solid #000; border-radius: 3px; width: 20px; height: 20px; background-color: #ddd; color: #000; text-align: center; right: 25px; top: 0px; font-size: 17px}
 .job_minus_button{position: absolute; border: 1px solid #000; border-radius: 3px; width: 20px; height: 20px; background-color: #ddd; color: #000; text-align: center; right: 0px; top: 0px; font-size: 17px}
 .job_xp_bar{position: relative; border: 1px solid #fff; margin-top: 1px; margin-right: 10px; margin-bottom: 3px; height: 2px; background-color: #fff; overflow: hidden}
@@ -74,6 +76,9 @@ body {background-color: #666}
 .node_dropdown{position: relative; min-height: 25px}
 .tall{height: 23px}
 .node_footer{height: 9px}
+
+.task_button_plus{right: 25px; width: 20px; background-color: #ddd; height: 20px; font-size: 17px}
+.task_button_minus{right: 0px; width: 20px; background-color: #ddd; height: 20px; font-size: 17px}
 
 .idol_button_minus{right: 0px; width: 7%}
 .idol_button_plus{right: 8%; width: 7%}
@@ -183,6 +188,7 @@ body {background-color: #666}
 
 .horrific{text-shadow: 2px 2px 5px #300}
 .exciting{text-shadow: 2px 2px 5px #420}
+.yellow-highlight{text-shadow: 2px 2px 5px #770}
 
 .import_box{position: fixed; right: 1%; bottom: 1%; height: 30%; width: 30%; background-color: #ddd; border: 1px solid black; border-radius: 3px; display: none}
 .import_text{-moz-user-select: auto; -webkit-user-select: auto; -ms-user-select: auto; position: absolute; height: 80%; width: 90%; margin: 10px}

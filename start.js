@@ -3,6 +3,6 @@ it.junction.show(it.junction.tabs.temple, 0)
 it.new_game();
 H.load_game();
 
-it.species.humans.value = it.species.humans.value
+//it.species.humans.value = it.species.humans.value
 
 it.clock.start()
