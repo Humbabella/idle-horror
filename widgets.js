@@ -302,7 +302,7 @@ Object.defineProperties(it.dosh, {
 				if (price_s[i]<0) price_s[i] = 0;
 			}			
 			
-			var format_s = format + '<br>Buy now: ';
+			var format_s = format + '<br><span class=\'yellow-highlight\'>Buy now:</span> ';
 			var can_sub = true;
 			for (i in price_s) {
 				if (price_s[i]) {
@@ -389,6 +389,169 @@ Object.defineProperties(it.dosh, {
 		}
 	}
 })
+
+it.population = new function () {
+	var pop = this;
+	pop.id = 'population';
+	pop.jobs = {};
+	
+	pop.node = H.e('div', false, 'population');
+	pop.unassigned_line = H.e('div', pop.node, 'job_holder', 'Unassigned Population: 0');
+	pop.unassigned_line.style.display = 'block';
+	
+	H.add_cvar(pop, 'max');
+	function remove_lost_population (args) {
+		if (args.clock_start) return;
+		if (args.old_value > args.value) {
+			var diff = args.old_value - args.value;
+			var a = available;
+			pop.available -= diff;
+			diff -= a;
+			while (diff>0) {
+				unassign_population();
+				diff--;
+			}
+		}
+		if (args.value > args.old_value) {
+			pop.available += args.value - args.old_value;
+		}
+	}
+	
+	function unassign_population() {
+		var i, a=[];
+		for (i in jobs) {
+			if (jobs[i].population>0) a.push[i]
+		}
+		var r = H.r(a.length)-1;
+		jobs[r].popluation -= 1;
+	}
+	
+	function give_xp() {
+		var i;
+		for (i in pop.jobs) {
+			pop.jobs[i].parent.experience += it.clock.tick_amount * pop.jobs[i].count * 30;
+		}
+	}
+	
+	it.cvars.max.population.update.add_result(remove_lost_population);
+	
+	var available = 0;
+	Object.defineProperty(pop, 'available', {
+		set: function (v) {
+			available = Math.max(0, v);
+			pop.unassigned_line.innerHTML = 'Unassigned Population: '+available;
+		},
+		get: function () {
+			return available;
+		}
+	})
+		
+	pop.add_job = function (job) {
+		var z = job.id;
+		pop.jobs[z] = {
+			id: 'population_' + z,
+			parent: job,
+			ui: H.e('div', pop.node, 'job_holder'),
+			tooltip: function () {
+				var i, verbose = false;
+				for (i in it.species) {
+					if (i!='humans'&&it.species[i].unlocked) verbose = true;
+				}
+				if (verbose) {
+					var t = 'Maximum effective workers: ';
+					for (i in it.species) {
+						if (it.species[i].unlocked&&it.species[i].jobs[z]) {
+							t += '<br>&nbsp;&bull; ' + it.species[i].name + ': ' + Math.round(1 / (1 - it.species[i].jobs[z].efficiency) - 1);
+						}
+					}
+				} else {
+					var t = 'Maximum effective workers: ';
+					t += Math.round(1 / (1 - it.species.humans.jobs[z].efficiency) - 1);
+				}
+				
+				if (job.experience_level) t += '<br>Effectivness Bonus: ' + (job.experience_level * 5) + '%';
+				t += '<br>Progress: ' + Math.floor((job.experience/job.next_level)*100)+'%';
+					
+				return t;
+			},
+			show_tooltip: function (e) {
+				it.tooltip.show(e, pop.jobs[z].tooltip, job.name);
+			},
+			click_plus: function (e) {
+				pop.jobs[z].plus.animate();
+				n = Math.min(pop.available, e.shiftKey ? 5 : 1);
+				if (n<=0) return;
+				pop.available -= n;
+				pop.jobs[z].count += n;
+			},
+			click_minus: function (e) {
+				pop.jobs[z].minus.animate();
+				n = Math.min(pop.jobs[z].count, e.shiftKey ? 5 : 1);
+				if (n<=0) return;
+				pop.available += n;
+				pop.jobs[z].count -= n;
+			}
+		}		
+			
+		var count = 0;
+		Object.defineProperty(pop.jobs[z], 'count', {
+			get: function () {return count},
+			set: function (v) {
+				count = v;
+				pop.jobs[z].count_display.innerHTML = count;
+			}
+		})
+		pop.jobs[z].name = H.e('div', pop.jobs[z].ui, 'job_name', job.name+': ');
+		pop.jobs[z].count_display = H.e('div', pop.jobs[z].ui, 'job_count', '0');
+		
+		pop.jobs[z].ui.addEventListener('mouseover', pop.jobs[z].show_tooltip);
+		pop.jobs[z].ui.addEventListener('mouseout', it.tooltip.hide);
+		pop.jobs[z].plus = H.e('div', pop.jobs[z].ui, 'job_plus_button', '+');
+		it.add_button_animation(pop.jobs[z].plus);
+		pop.jobs[z].minus = H.e('div', pop.jobs[z].ui, 'job_minus_button', '-');
+		it.add_button_animation(pop.jobs[z].minus);
+		
+		pop.jobs[z].plus.addEventListener('click', pop.jobs[z].click_plus);
+		pop.jobs[z].minus.addEventListener('click', pop.jobs[z].click_minus);
+	}
+	
+	pop.unlock_job = function (job_id) {
+		pop.jobs[job_id].ui.style.display = 'block';
+	}
+
+	pop.save_id = 'population';
+	pop.save_parameters = {}
+	
+	Object.defineProperties(pop.save_parameters, {
+		availability: {
+			get: function () {return available},
+			set: function (v) {pop.available = v},
+			enumerable: true
+		},
+		populations: {
+			get: function () {
+				var r = {}, i;
+				for (i in pop.jobs) {
+					r[i] = pop.jobs[i].count;
+				}
+				return r;
+			},
+			set: function (v) {
+				var i;
+				for (i in v) {
+					pop.jobs[i].count = v[i]
+				}
+			},
+			enumerable: true
+		}
+	})
+	
+	it.each_tick.add_result(give_xp);
+	
+	H.register_for_save(pop);
+	it.junction.add_node(pop, false, 'social', 'professions');
+	
+}
 
 
 it.log = new function () {
@@ -1350,7 +1513,7 @@ it.interest_instance = function (map, args) {
 				inter.consoles.open();
 			},
 			remove: function (v) {
-				var k = inter.console_list.indexOf(v);
+				var k = inter.console_list.indexOf(v+'_console');
 				if (k==-1) return;
 				inter.console_list.splice(k, 1);
 				inter.consoles.open();
@@ -1517,11 +1680,14 @@ it.interest_instance = function (map, args) {
 		it.each_tick.remove_result(tick);
 		H.add_class(inter.div, 'interest_expired');
 		inter.desc_lines[0].innerHTML = inter.description_expired;
-		if (inter.selected) inter.consoles.open();
+		for (i=1; i<inter.desc_lines.length; i++) {
+			inter.desc_lines[i].style.display = 'none';
+		}
 		var i;
 		for (i in inter.flags) {
 			inter.flags[i].on = 0;
 		}
+		if (inter.selected) inter.consoles.open();
 	}
 	
 	inter.destroy = function () {

@@ -245,15 +245,12 @@ it.construct_ui = function (node, args) {
 			node.it.draw(type)
 		},
 		
-		clear: function () {
-			while (node.it.heading_content.length) {
-				node.it.remove(node.it.heading_content[0], 'heading')
+		clear: function (type) {
+			var content = node.it[type + '_content'];
+			while (content.length) {
+				node.it.remove(content[0], type)
 			}
-			while (node.it.body_content.length) {
-				node.it.remove(node.it.body_content[0], 'body')
-			}
-			node.it.draw('heading');
-			node.it.draw('body');
+			node.it.draw(type);
 		},
 		
 		draw: function (type) {

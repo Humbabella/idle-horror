@@ -498,7 +498,7 @@ it.constructors = {
 			locks: args.locks,
 			unlocked: false,
 			node: H.e('div', false, 'locked_node'),
-			cost: {substitutions: {knowledge: {encyclopedia: 100}}}
+			cost: {substitutions: {knowledge: {encyclopedia: 100}, influence: {humans: 50}}}
 		};
 		
 		var i;
@@ -1396,9 +1396,34 @@ it.constructors = {
 	},
 	
 	governance: function (args, id) {
-		var gov = H.d(args);
-		gov.id = id;
-		gov.unlocked = true;
+		var gov = {
+			id: id,
+			name: args.name,
+			prosperity: args.prosperity,
+			science: args.science,
+			currency: args.currency,
+			control: args.control,
+			trade: args.trade,
+			culture: args.culture,
+			unlocked: args.unlocked,
+			save_id: id,
+			save_parameters: {}
+		}
+		
+		gov.unlock = function () {
+			gov.unlocked = true
+		}
+		
+		Object.defineProperties(gov.save_parameters, {
+			unlocked: {
+				get: function () {return gov.unlocked},
+				set: function (v) {gov.unlocked = v},
+				enumerable: true
+			}
+		})
+		
+		H.register_for_save(gov);
+		
 		return gov;
 	},
 	
@@ -1604,6 +1629,7 @@ it.constructors = {
 			
 		res.draw_max = function () {
 			if (res.max>0) res.max_div.innerHTML = ' / ' + Math.floor(res.max);
+			else res.max_div.innerHTML = '';
 			res.draw_value();
 		}
 		it.cvars.max[id].update.add_result(res.draw_max);
@@ -1834,84 +1860,11 @@ it.constructors = {
 			tooltip: args.tooltip,
 			atoms: args.atoms || [],
 			experience_level: 0,
-			next_level: 0.3,
+			next_level: 8,
 			levels: args.levels,
-			traditions: {
-				node: H.e('div', 0, 'locked_node'),
-				enabled: []
-			},
+			guild: args.guild,
 			species: []
 		};
-		
-		// Task UI
-		
-		it.construct_ui (job.traditions.node);
-		job.traditions.ui = job.traditions.node.it;
-		var task_ui = {}
-		
-		task_ui.name = H.e('td', 0, 'node_title', args.name);
-		task_ui.bar = H.e('td', 0, 'node_button node_button_wide');
-		task_ui.fill = H.e('div', task_ui.bar, 'node_button_fill');
-		task_ui.button_text = H.e('div', task_ui.bar, 'node_button_text');
-		//task_ui.tradition_count = H.e('div', 0, 'node_line', 'Traditions: None');
-		//task_ui.tradition_box = H.e('div', 0, 'node_line')
-		
-		task_ui.advancement = H.e('div', 0, 'node_line');
-		task_ui.max_workers = H.e('div', 0, 'node_line');
-		
-		job.traditions.update = function () {
-			job.traditions.ui.update();
-		}
-		
-		task_ui.bar.update = function () {
-			var p = (experience / job.next_level * 100)
-			task_ui.fill.style.left = p + '%';
-			task_ui.button_text.innerHTML = Math.floor(p) + '%';
-		}
-		task_ui.max_workers.update = function () {
-			task_ui.max_workers.innerHTML = 'Maximum effective followers: ' + Math.round((1 / (1 - it.species.humans.jobs[id].efficiency))-1);
-		}
-		task_ui.advancement.update = function () {
-			var t = job.next_level - experience;
-			var r = it.species.humans.xp_values[it.species.humans.jobs[id].rank];
-			if (!r) return task_ui.advancement.innerHTML = 'Assign more followers to practice this task.';
-			t /= r;
-			t -= 1 - it.clock.ticks_this_aut / it.clock.aut_length;
-			task_ui.advancement.innerHTML = 'Your followers will improve their performance on this task ' + (t<=0 ? ' this epoch.' : (t<= 1 ? ' next epoch.' : ' in ' + Math.ceil(t) + ' epochs.'));
-		}
-		
-		job.traditions.ui.add(task_ui.name, 'heading');
-		job.traditions.ui.add(task_ui.bar, 'heading');
-		job.traditions.ui.add(task_ui.max_workers);
-		job.traditions.ui.add(task_ui.advancement);
-		//job.traditions.ui.add(task_ui.tradition_count);
-		//job.traditions.ui.add(task_ui.tradition_box);
-		
-		it.junction.add_node(job.traditions, true, 'tasks', 'task_section');
-		
-		/*job.add_tradition = function (tradition) {
-			task_ui.tradition_box.appendChild(tradition.node);
-		}
-
-		job.traditions.enable = function (tradition) {
-			if (job.traditions.enabled.length>=job.level) return false;
-			if (job.traditions.enabled.indexOf(tradition)!=-1) return false;
-			job.traditions.enabled.push(tradition);
-			draw_tradition_count();
-			return true;
-		}
-
-		job.traditions.disable = function (tradition) {
-			var k = job.traditions.enabled.indexOf(tradition);
-			if (k!=-1) job.traditions.enabled.splice(k,1);
-			draw_tradition_count();
-		}*/
-				
-		// Helper functions
-		
-		/*function draw_tradition_count () {
-			task_ui.tradition_count.innerHTML = 'Traditions: '+job.traditions.enabled.length+'/'+job.experience_level;
-		};*/
 		
 		function apply_atoms() {
 			H.apply_atoms(job)
@@ -1925,8 +1878,8 @@ it.constructors = {
 			var i;
 			job.experience = 0;
 			job.experience_level += 1;
-			if (job.experience_level<=2) job.next_level = [0.3, 1.5, 7][job.experience_level];
-			else job.next_level = 16 * (job.experience_level - 2);
+			if (job.experience_level<=2) job.next_level = [8, 45, 210][job.experience_level];
+			else job.next_level = 480 * (job.experience_level - 2) * Math.pow(1.05, job.experience_level - 3);
 			var report = 'Your ' + job.name + 's advance their skills.';
 			if (job.levels&&job.levels[job.experience_level]) report = job.levels[job.experience_level](job, report);
 			if (!args||!args.silent) {
@@ -1935,7 +1888,6 @@ it.constructors = {
 			for (i in job.species) {
 				it.cvars.efficiency[job.species[i].jobs[id].id].update();
 			};
-			//draw_tradition_count ()
 		};
 
 		// Define cvars
@@ -1943,6 +1895,15 @@ it.constructors = {
 		H.add_cvar(job, 'name', args.name);
 		H.add_cvar(job, 'description', args.description);
 		H.add_cvar(job, 'count', 0);
+		
+		var level_bonus = {
+			type: 'count',
+			target: id,
+			order: 700,
+			func: function (x) {return x *= 1 + job.experience_level * .05}
+		}
+		
+		it.cvars.count[id].add_atom(level_bonus);
 		
 		it.cvars.count[id].update.add_result(apply_atoms);
 		
@@ -1969,10 +1930,14 @@ it.constructors = {
 		
 		job.unlock = function () {
 			job.unlocked = 1;
-			job.traditions.node.style.display = 'block';
+			if (job.guild) it.population.unlock_job(job.id);
 		}
 		
-		var experience= 0;
+		if (job.guild) {
+			it.population.add_job(job);
+		}
+		
+		var experience= 0
 		Object.defineProperties(job, {
 			experience: {
 				get: function () {return experience},
@@ -1981,7 +1946,7 @@ it.constructors = {
 					if (experience >= job.next_level) level_up()
 				}
 			}
-		})	
+		})
 			
 		// Save stuff
 		
@@ -2066,8 +2031,9 @@ it.constructors = {
 		}
 		
 		function draw_jobs () {
+			var c_val, c_next, i;
 			for (i in species.jobs) {
-				species.jobs[i].name.innerHTML = it.jobs[i].name + ': ' + species.jobs[i].count;
+				species.jobs[i].count_display.innerHTML = species.jobs[i].count;
 			}
 		}
 		
@@ -2144,11 +2110,35 @@ it.constructors = {
 			if (!species.jobs[z].multiplier) species.jobs[z].multiplier = 1;
 			species.jobs[z].count = 0;
 			species.jobs[z].ui = H.e('div', species.node, 'job_holder');
-			species.jobs[z].name = H.e('div', species.jobs[z].ui, 'job_name', it.jobs[z].name + ': 0');
+			species.jobs[z].name = H.e('div', species.jobs[z].ui, 'job_name', it.jobs[z].name+': ');
+			species.jobs[z].count_display = H.e('div', species.jobs[z].ui, 'job_count', '0');
 			H.add_cvar(species.jobs[z], 'efficiency', species.jobs[z].base_efficiency||5);
-			var final_efficiency = H.atom(species.jobs[z].id, 'efficiency', 1000, function (x) {return 1 - 1/(x + species.efficiency_mod)});
+			var final_efficiency = H.atom(
+				species.jobs[z].id, 
+				'efficiency', 
+				1000, 
+				function (x) {
+					var v = x + species.efficiency_mod;
+					return 1 - 1/v
+				}
+			);
+			species.jobs[z].tooltip = function () {
+				var t = it.jobs[z].tooltip(it.jobs[z]);
+				if (species.show_efficiency) {
+					var x = species.jobs[z].count, k = species.jobs[z].efficiency;
+					var margin = Math.round(((k-1)*x+k)*Math.pow(k, x-1)*100);
+					t += '<br><br>Next worker is at '+margin+'% efficiency';					
+				}
+				return t
+			}
+			species.jobs[z].show_tooltip = function (e) {
+				it.tooltip.show(e, species.jobs[z].tooltip, it.jobs[z].name);
+			}
+			species.jobs[z].ui.addEventListener('mouseover', species.jobs[z].show_tooltip);
+			species.jobs[z].ui.addEventListener('mouseout', it.tooltip.hide);
 			it.cvars.efficiency[species.jobs[z].id].add_atom(final_efficiency);
 			it.cvars.efficiency[species.jobs[z].id].update.add_result(apply_atoms);
+			it.cvars.efficiency[species.jobs[z].id].update.add_result(draw_jobs);
 			H.add_cvar(species.jobs[z], 'busy', 0);
 			it.cvars.busy[species.jobs[z].id].update.add_result(apply_atoms);
 			if (species.default_job==z) {
@@ -2237,6 +2227,8 @@ it.constructors = {
 					value = v;
 					species.current_div.innerHTML = value;
 					cap_value();
+					var i;
+					for (i in species.jobs) species.jobs[i].old_count = species.jobs[i].count;
 					redistribute();
 					species.update_value();
 					species.update_jobs();
@@ -2258,7 +2250,6 @@ it.constructors = {
 			}
 		});
 		
-			
 		species.name_div = H.e('td', species.value_display, 'resource_name', species.name);
 		species.current_div = H.e('td', species.value_display, 'resource_current', '0');
 		species.max_div = H.e('td', species.value_display, 'resource_max');
@@ -2272,6 +2263,7 @@ it.constructors = {
 		species.unlock = function () {
 			species.unlocked=1;
 			it.junction.unlock('cult', species.id)
+			species.value_display.style.display = 'table-row';
 		}
 		
 		Object.defineProperties(species.save_parameters, {
@@ -2308,7 +2300,6 @@ it.constructors = {
 				}
 			}
 		})
-		
 		
 		if (args.initialize) args.initialize(species);
 		

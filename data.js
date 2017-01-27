@@ -49,13 +49,16 @@ data = {
 			]
 		},
 		{
-			id: 'tasks',
-			name: 'Guilds',
+			id: 'social',
+			name: 'Culture',
 			sections: [
 				{
-					id: 'task_section',
-					name: 'Professions',
-					show: true
+					id: 'professions',
+					name: 'Professions'
+				},
+				{
+					id: 'governance',
+					name: 'Governance'
 				}
 			]
 		},
@@ -190,6 +193,7 @@ data = {
 			tooltip: function (me) {
 				return 'Generates ' + me.food_effect + ' sustenance per Epoch.'
 			},
+			guild: true,
 			generates: {food: 200}
 		},
 		farmer: {
@@ -198,6 +202,7 @@ data = {
 			tooltip: function (me) {
 				return 'Produces ' + me.farmer_production + ' per epoch if you have sufficient farms to hold all production.'
 			},
+			guild: true,
 			cvars: {farmer_production: 400},
 			atoms: [
 				{
@@ -219,6 +224,7 @@ data = {
 				if (me.fragment_effect)  t+='<br><br>Each labourer will also find '+me.fragment_effect+' per Epoch.'
 				return t;
 			},
+			guild: true,
 			atoms: [
 				{
 					type: 'max',
@@ -236,7 +242,8 @@ data = {
 			generates: {fabrications: 100},
 			tooltip: function (me) {
 				return 'Generates '+me.fabrications_effect+' fabrications per Epoch.'
-			}
+			},
+			guild: true,
 		},
 		contemplative: {
 			object_type: 'job',
@@ -244,7 +251,8 @@ data = {
 			generates: {knowledge: 50},
 			tooltip: function (me) {
 				return 'Generates '+me.knowledge_effect+' ingenuity per Epoch.'
-			}
+			},
+			guild: true,
 		},
 		researcher: {
 			object_type: 'job',
@@ -262,12 +270,14 @@ data = {
 						return x + it.jobs.researcher.count * it.jobs.researcher.research_effect;
 					}
 				}
-			]
+			],
+			guild: true,
 		},
 		humans: {
 			object_type: 'species',
 			name: 'Followers',
 			default_job: 'worshipper',
+			unlocked: true,
 			jobs: {
 				worshipper: {priority: true, base_efficiency: 5},
 				hunter: {priority: true, base_efficiency: 12},
@@ -361,23 +371,13 @@ data = {
 				H.add_cvar(me, 'housing_decay', .25);
 				H.add_cvar(me, 'disease', 0);
 				H.add_cvar(me, 'disease_cap', .9);
-				H.add_cvar(me, 'xp_values', []);
+				H.add_cvar(me, 'death_xp', 0);
 				H.add_cvar(me, 'influence_gain', 1);
 				H.add_cvar(me, 'exhaustion', 0);
 				function adjust_disease (args) {
 					if (args.old_value&&!args.clock_start) it.species.humans.counters.disease.set_max *= args.value / args.old_value;
 				}
 				it.cvars.disease.humans.update.add_result(adjust_disease);
-				set_base_xp_values = H.atom('humans', 'xp_values', 1, function (x) {return []});
-				it.cvars.xp_values.humans.add_atom(set_base_xp_values);
-				function give_job_xp () {
-					for (i in me.jobs) {
-						if (me.xp_values[me.jobs[i].rank]) {
-							it.jobs[i].experience += me.xp_values[me.jobs[i].rank] * it.clock.tick_amount;
-						}
-					}
-				};
-				it.each_tick.add_result(give_job_xp);
 				function add_job_level_effect (z) {
 					var level_efficiency = H.atom(me.jobs[z].id, 'efficiency', 400, function (x) {return x + it.jobs[z].experience_level});
 					it.cvars.efficiency[me.jobs[z].id].add_atom(level_efficiency);
@@ -396,6 +396,15 @@ data = {
 						H.apply_atoms(me);
 					},
 					o: 501
+				},
+				{
+					f: function (args) {
+						var me = args.parent;
+						for (i in me.jobs) {
+							if (me.jobs[i].old_count > me.jobs[i].count) it.jobs[i].experience += me.death_xp;
+						}
+					},
+					o: 601
 				}
 			],
 			update_jobs: [
@@ -762,7 +771,7 @@ data = {
 		culture: {
 			object_type: 'resource',
 			name: 'Urbanity',
-			base_max: 1000,
+			base_max: 20,
 			table: 2
 		},
 		assign_jobs: {
@@ -775,6 +784,7 @@ data = {
 				it.junction.unlock('cult');
 				it.visions.hunger.unlock();
 				it.visions.tap_labour.unlock();
+				it.species.humans.unlock();
 			}
 		},
 		hunger: {
@@ -1207,14 +1217,10 @@ data = {
 			atoms: [
 				{
 					target: 'humans',
-					type: 'xp_values',
+					type: 'death_xp',
 					order: 400,
 					func: function (x) {
-						if (!x[1]) x[1]=2;
-						else x[1]+=2;
-						if (!x[2]) x[2]=1;
-						else x[2]+=1;
-						return x;
+						return x+1;
 					}
 				}
 			],
@@ -1684,6 +1690,7 @@ data = {
 					if (args.sign) {
 						deity_effect_line.innerHTML = '<br>' + args.sign.deity.effect_text;
 						if (args.sign.deity.love_text[args.sign.deity.hatred])deity_love_line.innerHTML = '<br>' + args.sign.deity.love_text[args.sign.deity.hatred];
+						else deity_love_line.innerHTML = '';
 					}
 				}
 				it.deity_chooser.draw_sign.add_result(make_effect_and_love);
@@ -1775,10 +1782,10 @@ data = {
 			age: 5,
 			locks: 2,
 			description: 'Exchanging goods and ideas with others.',
-			announce: 'Exploring can locate villages, which increase research rate by the helpful exchange of ideas.',
+			announce: 'You can build a trade post that improves relationships with other settlements.',
 			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
-			cost_factor: {knowledge: 15},
+			cost_factor: {culture: 5},
 			apply: function () {
 				it.improvements.drama.unlock();
 				it.works.trade_post.unlock();
@@ -1803,7 +1810,7 @@ data = {
 					target: 'currency',
 					order: 400,
 					seed_func: function (x, me) {
-						return x + (it.interests.village.currency_return + it.governances[me.governance].currency_modifier) * me.population;
+						return x + (it.interests.village.currency_return + it.governances[me.governance].currency) * me.population;
 					},
 					disabled: 1,
 					id: 'civil_service'
@@ -1813,7 +1820,7 @@ data = {
 					target: 'influence',
 					order: 400,
 					seed_func: function (x, me) {
-						return x - (it.interests.village.control_cost + it.governances[me.governance].control_modifier) * me.population;
+						return x - (it.interests.village.control_cost + it.governances[me.governance].control) * me.population;
 					},
 					disabled: 1,
 					id: 'civil_service'
@@ -1823,15 +1830,36 @@ data = {
 					target: 'culture',
 					order: 400,
 					seed_func: function (x, me) {
+						return x + it.governances[me.governance].culture * me.population
+					},
+					disabled: 1,
+					id: 'civil_service'
+				}
+				var village_culture_max_atom = {
+					type: 'max',
+					target: 'culture',
+					order: 700,
+					seed_func: function (x, me) {
+						return x * (Math.pow(1.5, it.governances[me.governance].culture * me.population))
+					},
+					disabled: 1,
+					id: 'civil_service'
+				}
+				var village_population_atom = {
+					type: 'max',
+					target: 'population',
+					order: 400,
+					seed_func: function (x, me) {
 						return x + me.population
 					},
 					disabled: 1,
 					id: 'civil_service'
 				}
 				it.interests.village.new_atom(village_currency_atom);
-				it.interests.village.new_atom(
-				village_influence_atom);
+				it.interests.village.new_atom(village_influence_atom);
 				it.interests.village.new_atom(village_culture_atom);
+				it.interests.village.new_atom(village_culture_max_atom);
+				it.interests.village.new_atom(village_population_atom);
 				it.interests.village.new_flag({
 					name: 'Influence',
 					icon: '&#128065;',
@@ -1852,7 +1880,8 @@ data = {
 					}
 				});
 				it.consoles.governance_console.unlock();
-			}
+			},
+			unlocks: ['trade', 'guilds']
 		},
 		archaeology: {
 			object_type: 'tech',
@@ -1878,7 +1907,7 @@ data = {
 			announce: 'Your merchants can now trade resources for currency which can be spent in place of other common resources for works.',
 			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
-			cost_factor: {labour: 100, knowledge: 25},
+			cost_factor: {knowledge: 25, culture: 5},
 			fixed_cost: {rarities: 1},
 			apply: function () {
 				it.resources.currency.unlock();
@@ -1904,13 +1933,13 @@ data = {
 								return parent.buy_type
 							},
 							order: 900,
-							seed_func: function (x) {return x - 100}
+							seed_func: function (x, me) {return x - 100 * me.population}
 						},
 						{
 							type: 'tick',
 							target: 'currency',
 							order: 400,
-							seed_func: function (x, me) {return x + 20 * it.governances[me.governance].trade_modifier}
+							seed_func: function (x, me) {return x + 20 * it.governances[me.governance].trade * me.population}
 						}
 					]
 				});				
@@ -1963,15 +1992,14 @@ data = {
 			object_type: 'tech',
 			name: 'Guilds',
 			age: 5,
-			locks: 1,
+			locks: 2,
 			description: 'Guilds systematize professions to better pass on professional knowledge to new generations.',
 			announce: 'You can now build an academy that will increase the rate at which your occupations improve.',
 			show_in: {tab: 'research', section: 'society'},
 			time_factor: 0.8,
-			cost_factor: {knowledge: 10, labour: 50},
+			cost_factor: {culture: 5},
 			apply: function () {
-				it.works.academy.unlock();
-				it.junction.unlock('tasks', 'task_section');
+				it.junction.unlock('social', 'professions');
 			}
 		},
 		husbandry: {
@@ -2029,6 +2057,12 @@ data = {
 				if (me.level) it.clock.check_time.add_result(me.show_time, 201)
 				if (me.level>=2) it.resources.influence.on_tick.add_result(me.increasing, 701)
 				if (me.level>=3) it.resources.corpses.on_tick.add_result(me.corpse_decay, 701)
+				if (me.level>=4) {
+					var i;
+						for (i in it.species) {
+						it.species[i].show_efficiency=true;
+					}
+				}
 			}
 		},
 		bonfire: {
@@ -2216,7 +2250,7 @@ data = {
 			object_type: 'work',
 			name: 'Apothecary\'s',
 			description: 'A workshop to produce medicines.',
-			cvars: {disease_reduction: 0.2, red_death_reduction: 0.1},
+			cvars: {disease_reduction: 0.1, red_death_reduction: 0.1},
 			show_in: {tab: 'works', section: 'buildings'},
 			cost_function: function (me) {
 				return {
@@ -2275,9 +2309,9 @@ data = {
 				}
 			]
 		},
-		academy: {
+/*		academy: {
 			object_type: 'work',
-			name: 'Adcademy',
+			name: 'Academy',
 			description: 'A place to learn specialized skills. Increases the rate of experience gain for professions.',
 			show_in: {tab: 'works', section: 'buildings'},
 			cost_function: function (me) {
@@ -2301,7 +2335,7 @@ data = {
 					}
 				}
 			]
-		},
+		},*/
 		idol: {
 			object_type: 'work',
 			name: 'Icon',
@@ -2594,7 +2628,7 @@ data = {
 			object_type: 'improvement',
 			name: 'Drama and Poetry',
 			description: 'Works that influence thoughts and feelings.<br>Increases the rate at which new followers arrive.',
-			show_in: {tab: 'research', section: 'science'},
+			show_in: {tab: 'research', section: 'society'},
 			locks: 1,
 			time_function: function (me) {
 				return 5 * (me.level + 1) * Math.pow(1.3, me.level)
@@ -2604,7 +2638,7 @@ data = {
 					labour: Math.min(me.level+1, 5) * 10,
 					fabrications: 10,
 					knowledge: 100 * (me.level * 1/2 + 1) * Math.pow(1.2, me.level),
-					influence: 50 * (me.level * 1/2 + 1) * Math.pow(1.2, me.level)
+					culture: 5 * (me.level * 1/2 + 1) * Math.pow(1.2, me.level)
 				}
 			},
 			atoms: [
@@ -2626,7 +2660,7 @@ data = {
 			description: 'Compendia of all-around knowledge.<br>These can be spent in place of ingenuity to reasearch new technologies.',
 			show_in: {tab: 'research', section: 'science'},
 			time_function: function (me) {
-				return 5 * (me.level + 1);
+				return (me.level * 2 + 1);
 			},
 			cost_function: function (me) {
 				return {
@@ -3186,7 +3220,7 @@ data = {
 				'Hisessifsiths recognizes you. She limits the effect of her sign on your followers.',
 				false,
 				'Hisessifsiths is angered. She ensures your followers have no spare thoughts to generate ingenuity.',
-				'Hisessifsiths seethes with rage. She absorbs all of your follower\'s best ideas.'
+				'Hisessifsiths seethes with rage. She con.'
 			],
 			sign_name: 'Sign of Hisessifsiths',
 			sign_icon: '&#9796;',
@@ -3196,6 +3230,13 @@ data = {
 					hatred: [0,1,2,3,4,5],
 					type: 'knowledge_effect',
 					target: 'contemplative',
+					order: 700,
+					func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
+				},
+				{
+					hatred: [0,1,2,3,4,5],
+					type: 'tick',
+					target: 'culture',
 					order: 700,
 					func: function (x, me) {return x * [2, 1, .75, .15, 0, 0][me.hatred]}
 				}
@@ -3399,7 +3440,7 @@ data = {
 			types: {land:1},
 			icon: '&#9978;&#65038;',
 			unlocked: true,
-			cvars: {progress: 0, science_bonus: .3, prosperity: 0.05, control_cost: 10, currency_return: 0},
+			cvars: {progress: 0, science_bonus: 0, prosperity: 0, control_cost: 0, currency_return: 0},
 			saves: ['governance', 'population_bits', 'population'],
 			description: 'Exchanging goods and ideas with villagers increases the effectiveness of research.',
 			description_expired: 'Structures here suggest that people lived here not too long ago, but no one can be found.',
@@ -3407,7 +3448,7 @@ data = {
 				me.buy_type = (H.r()<.5 ? 'food' : 'fabrications');
 				me.population_bits = 0;
 				var population = 1;
-				var governance = 'none';
+				var governance = 'non_governance';
 				Object.defineProperties(me, {
 					governance: {
 						get: function () {return governance},
@@ -3429,7 +3470,7 @@ data = {
 			},
 			tick_handler: function (me, my_parent) {
 				if (me.expired) return;
-				me.population_bits += (my_parent.prosperity + it.governances[me.governance].prosperity_modifier) * it.clock.tick_amount / me.population;
+				me.population_bits += (my_parent.prosperity + it.governances[me.governance].prosperity) * it.clock.tick_amount / Math.pow(2,me.population-1);
 				if (me.population_bits>1) {
 					me.population++;
 					me.population_bits--;
@@ -3445,11 +3486,11 @@ data = {
 					target: 'research',
 					order: 400,
 					seed_func: function (x, me) {
-						return x + (it.interests.	village.science_bonus + it.governances[me.governance].science_modifier) * me.population;
+						return x + (it.interests.village.science_bonus + it.governances[me.governance].science) * me.population;
 					}
 				}
 			],
-			discover: ['trade', 'civil_service']
+			discover: ['civil_service']
 		},
 		shrine: {
 			object_type: 'interest',
@@ -3487,14 +3528,25 @@ data = {
 			},
 			discover: ['theology']
 		},
-		none: {
+		non_governance: {
 			object_type: 'governance',
 			name: 'Non-interference',
-			prosperity_modifier: 0,
-			science_modifier: 0,
-			currency_modifier: 0,
-			control_modifier: -10,
-			trade_modifier: 1
+			prosperity: 0.05,
+			science: 0.3,
+			currency: 0,
+			control: 0,
+			trade: 1,
+			culture: 1
+		},
+		hedonism: {
+			object_type: 'governance',
+			name: 'Hedonism',
+			prosperity: 0.2,
+			science: 0,
+			currency: 0,
+			control: 0,
+			trade: 1,
+			culture: 0.3
 		},
 		doom: {
 			object_type: 'omen',
@@ -3589,7 +3641,7 @@ data = {
 			name: 'Description',
 			unlocked: 1,
 			select: function (me, value) {
-				me.ui.clear();
+				me.ui.clear('body');
 				me.ui_lines.name.innerHTML = '<b>' + value.name + '</b>' + (value.expired ? ' (Expired)' : '');
 				var i;
 				for (i in value.desc_lines) {
