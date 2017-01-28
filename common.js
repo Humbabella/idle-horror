@@ -11,6 +11,22 @@ H = {
 		}
 	},
 	
+	attach_atoms: function (obj, atom_list) {
+		if (!obj.atoms) obj.atoms=[];
+		var i, a;
+		for (i in atom_list) {
+			a = H.d(atom_list[i]);
+			a.owner = obj;
+			obj.atoms.push(a);
+		}
+		if (!obj.apply_atoms) obj.apply_atoms = function () {
+			var ii;
+			for (ii in obj.atoms) {
+				H.apply_atom(obj.atoms[ii]);
+			}
+		}
+	},
+	
 	c: function (x, y) {
 		if (typeof(x)=='function') return x(y);
 		return x
@@ -150,7 +166,7 @@ H = {
 			var i, x = initial_value;
 			for (i in atoms) {
 				if (typeof(atoms[i].func)!='function') console.log(atoms[i]);
-				if (!atoms[i].disabled) x = atoms[i].func(x, obj);
+				if (!atoms[i].disabled) x = atoms[i].func(x, atoms[i].owner);
 			}
 			args.value = x;
 			value = x;

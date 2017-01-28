@@ -95,7 +95,9 @@ it.constructors = {
 			H.apply_atoms(deity);
 		}
 		
-		function add_atom(z) {
+		H.attach_atoms(deity, args.atoms)
+		
+		/*function add_atom(z) {
 			deity.atoms.push({
 				hatred: z.hatred,
 				type: z.type,
@@ -110,7 +112,7 @@ it.constructors = {
 		
 		for (i in args.atoms) {
 			add_atom(args.atoms[i])
-		}
+		}*/
 		
 		deity.get_sign = function (load) {
 			
@@ -486,7 +488,6 @@ it.constructors = {
 			name: args.name,
 			description: args.description,
 			show_in: args.show_in,
-			atoms: args.atoms,
 			apply: args.apply,
 			cost_factor: args.cost_factor,
 			fixed_cost: args.fixed_cost,
@@ -500,6 +501,8 @@ it.constructors = {
 			node: H.e('div', false, 'locked_node'),
 			cost: {substitutions: {knowledge: {encyclopedia: 100}, influence: {humans: 50}}}
 		};
+		
+		H.attach_atoms(tech, args.atoms);
 		
 		var i;
 		tech.cost.cost = H.d(tech.cost_factor);
@@ -730,7 +733,6 @@ it.constructors = {
 			name: args.name,
 			description: args.description,
 			show_in: args.show_in,
-			atoms: args.atoms,
 			apply: args.apply,
 			type: args.type,
 			progress: 0,
@@ -740,6 +742,8 @@ it.constructors = {
 			node: H.e('div', false, 'locked_node'),
 			cost: {}
 		};
+		
+		H.attach_atoms(improv, args.atoms);
 		
 		function reset_cost () {
 			improv.cost.cost = args.cost_function(improv);
@@ -936,10 +940,11 @@ it.constructors = {
 			name: args.name,
 			show_in: args.show_in,
 			description: args.description,
-			atoms: args.atoms,
 			node: H.e('div', 0, 'locked_node'),
 			cost: {cost: args.cost}
 		}
+		
+		H.attach_atoms(vis, args.atoms)
 		
 		for (i in args.cvars) {
 			H.add_cvar(vis, i, args.cvars[i])
@@ -1060,9 +1065,10 @@ it.constructors = {
 			show_in: args.show_in,
 			apply: args.apply,
 			description: args.description,
-			atoms: args.atoms,
 			node: H.e('div', 0, 'locked_node')
 		}
+		
+		H.attach_atoms(scheme, args.atoms)
 		
 		it.construct_ui (scheme.node);
 		scheme.ui = scheme.node.it;
@@ -1139,7 +1145,6 @@ it.constructors = {
 			show_in: args.show_in,
 			substitutions: args.substitutions || {fabrications: {currency: 1}, knowledge: {currency: 2}},
 			description: args.description,
-			atoms: args.atoms,
 			level: 0,
 			save_id: id,
 			save_parameters: {},
@@ -1148,6 +1153,8 @@ it.constructors = {
 			cost_function: args.cost_function,
 			cost: {installments: {made: 0}}
 		};
+		
+		H.attach_atoms(work, args.atoms);
 		
 		var description = args.description;
 		Object.defineProperty(work, 'description', {
@@ -1858,13 +1865,14 @@ it.constructors = {
 		var i, job = {
 			id: id,
 			tooltip: args.tooltip,
-			atoms: args.atoms || [],
 			experience_level: 0,
 			next_level: 8,
 			levels: args.levels,
 			guild: args.guild,
 			species: []
 		};
+		
+		H.attach_atoms(job, args.atoms);
 		
 		function apply_atoms() {
 			H.apply_atoms(job)
@@ -1900,7 +1908,8 @@ it.constructors = {
 			type: 'count',
 			target: id,
 			order: 700,
-			func: function (x) {return x *= 1 + job.experience_level * .05}
+			func: function (x) {return x *= 1 + job.experience_level * .05},
+			owner: job
 		}
 		
 		it.cvars.count[id].add_atom(level_bonus);
@@ -1922,7 +1931,8 @@ it.constructors = {
 				func: function (z) {
 					job[x+'_total_effect'] = job.count * job[x+'_effect'];
 					return z + job[x+'_total_effect'];
-				}
+				},
+				owner: job
 			}}(i))
 		}
 		
@@ -2313,8 +2323,7 @@ it.constructors = {
 
 var plurals = {
 	deity: 'deities', 
-	species: 'species',
-	faux_resource: 'resources'
+	species: 'species'
 }
 it.warehousing = {};
 it.ids = {};

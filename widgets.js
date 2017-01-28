@@ -1203,7 +1203,7 @@ it.research = new function research () {
 	}
 	
 	function set_cost_multipliers (args) {
-		args.time_multiplier = Math.pow(research.time_expansion, args.innovations)/6 * (1 + args.innovations/4) * (args.innovations>=10 ? 12 : Math.pow(1.30, args.innovations));
+		args.time_multiplier = Math.pow(research.time_expansion, args.innovations)/3 * (1 + args.innovations/4) * (args.innovations>=10 ? 12 : Math.pow(1.3, args.innovations));
 		args.cost_multiplier = Math.pow(research.cost_expansion, args.innovations)/10 * (1 + args.innovations/2);
 		args.extra_knowledge_cost = Math.pow(Math.max(args.innovations-3,0),2) * 5;
 		return args;
@@ -1795,10 +1795,11 @@ it.world_map = new function () {
 	world_map.map_list = [];
 	world_map.active_interests = [];
 	world_map.atoms = [];
+	world_map.map_qualities = [.001, .01, .05, .3, 1];
 	world_map.save_id = 'world_map'
 	world_map.save_parameters = {}
 	
-	H.add_cvar(world_map, 'base_interests', 6);
+	H.add_cvar(world_map, 'interest_quality', 0);
 	
 	H.add_cvar(world_map, 'max_maps', 1);
 	function check_new_tile() {
@@ -1923,7 +1924,7 @@ it.world_map = new function () {
 			tile: tiles[tile_number],
 			rotate: (args.rotate ? args.rotate : Math.floor(Math.random()*4)),
 			div: H.e('div', false, 'map_image'),
-			interests: (args.interests ? args.interests : Math.ceil(Math.random()*(world_map.base_interests+tile_number)/5)),
+			interests: (args.interests ? args.interests : -1),
 			interest_list: [],
 			discoveries: args.discoveries || 0,
 			nonants: (args.nonants) || [0, 1, 2, 3, 4, 5, 6, 7, 8],
@@ -1934,6 +1935,16 @@ it.world_map = new function () {
 					delete map.interest_list[i];
 				}
 			}
+		}
+		
+		if (map.interests==-1) {
+			var r = H.r() / (world_map.interest_quality + .2 * tile_number);
+			var i;
+			for (i=0; i<world_map.map_qualities.length; i++) {
+				r-=world_map.map_qualities[0];
+				if (r<=0) break;
+			}
+			map.interests = world_map.map_qualities.length - i;
 		}
 		
 		if (args.image) map.image = args.image;

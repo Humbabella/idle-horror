@@ -180,8 +180,7 @@ data = {
 					type: 'gather',
 					target: 'influence',
 					order: 400,
-					func: function (x) {
-						me = it.jobs.worshipper
+					func: function (x, me) {
 						return x + me.count * me.influence_effect
 					}
 				}
@@ -209,8 +208,8 @@ data = {
 					type: 'production',
 					target: 'farm',
 					order: 400,
-					func: function (x) {
-						return x + it.jobs.farmer.count * it.jobs.farmer.farmer_production
+					func: function (x, me) {
+						return x + me.count * me.farmer_production
 					}
 				}
 			]
@@ -218,7 +217,7 @@ data = {
 		labourer: {
 			object_type: 'job',
 			name: 'Labourer',
-			generates: {labour: 100, ore: 0, rarities: 0, food: 0},
+			generates: {labour: 50, ore: 0, rarities: 0, food: 0},
 			tooltip: function (me) {
 				var t = 'Generates '+me.labour_effect+' labour per Epoch, and increases the maximum amount of labour that can be stored by the same amount.<br><br>If labourers are unassigned, existing labour will not be lost, but total labour will not increase as long as it is above the maximum.';
 				if (me.fragment_effect)  t+='<br><br>Each labourer will also find '+me.fragment_effect+' per Epoch.'
@@ -230,8 +229,8 @@ data = {
 					type: 'max',
 					target: 'labour',
 					order: 400,
-					func: function (x) {
-						return x + it.jobs.labourer.count * it.jobs.labourer.labour_effect
+					func: function (x, me) {
+						return x + me.count * me.labour_effect
 					}
 				}
 			]
@@ -239,7 +238,7 @@ data = {
 		manufacturer: {
 			object_type: 'job',
 			name: 'Manufacturer',
-			generates: {fabrications: 100},
+			generates: {fabrications: 50},
 			tooltip: function (me) {
 				return 'Generates '+me.fabrications_effect+' fabrications per Epoch.'
 			},
@@ -248,7 +247,7 @@ data = {
 		contemplative: {
 			object_type: 'job',
 			name: 'Contemplative',
-			generates: {knowledge: 50},
+			generates: {knowledge: 25},
 			tooltip: function (me) {
 				return 'Generates '+me.knowledge_effect+' ingenuity per Epoch.'
 			},
@@ -266,8 +265,8 @@ data = {
 					type: 'effect',
 					target: 'research',
 					order: 400,
-					func: function (x) {
-						return x + it.jobs.researcher.count * it.jobs.researcher.research_effect;
+					func: function (x, me) {
+						return x + me.count * me.research_effect;
 					}
 				}
 			],
@@ -439,8 +438,8 @@ data = {
 			name: 'Beasts',
 			default_job: 'labourer',
 			jobs: {
-				labourer: {multiplier: 0.9, base_efficiency: 5},
-				farmer: {multiplier: 0.9, base_efficiency: 2, priority: true}
+				labourer: {multiplier: 1, base_efficiency: 5},
+				farmer: {multiplier: 1, base_efficiency: 2, priority: true}
 			},
 			food_use: 100,
 			food_type: 'food',
@@ -690,8 +689,8 @@ data = {
 			table: 2,
 			warehousing: {
 				name: 'Granary',
-				cost: {labour: 25, fabrications: 10, food: 5},
-				sell: {labour: 25},
+				cost: {labour: 10, fabrications: 5, food: 5},
+				sell: {labour: 20},
 				effect: 20,
 			},
 			commerce_value: 1,
@@ -706,13 +705,13 @@ data = {
 		ore: {
 			object_type: 'resource',
 			name: 'Rudiments',
-			base_max: 50,
+			base_max: 20,
 			table: 2,
 			warehousing: {
 				name: 'Cellar',
 				cost: {labour: 25, fabrications: 25},
-				sell: {labour: 25},
-				effect: 100
+				sell: {labour: 20},
+				effect: 20
 			},
 			commerce_value: 10
 		},
@@ -723,8 +722,8 @@ data = {
 			table: 2,
 			warehousing: {
 				name: 'Warehousing',
-				cost: {labour: 25, fabrications: 25},
-				sell: {labour: 25},
+				cost: {labour: 10, fabrications: 10},
+				sell: {labour: 20},
 				effect: 50
 			},
 			commerce_value: 1,
@@ -738,7 +737,7 @@ data = {
 			warehousing: {
 				name: 'Display Case',
 				cost: {labour: 25, fabrications: 10, rarities: 5},
-				sell: {labour: 25},
+				sell: {labour: 20},
 				effect: 10
 			},
 			commerce_value: 25
@@ -751,7 +750,7 @@ data = {
 			warehousing: {
 				name: 'Vault',
 				cost: {labour: 25, fabrications: 50, currency: 1000},
-				sell: {labour: 25},
+				sell: {labour: 20},
 				effect: 500
 			},
 			commerce_value: 1
@@ -763,8 +762,8 @@ data = {
 			table: 2,
 			warehousing: {
 				name: 'Archives',
-				cost: {labour: 25, knowledge: 15},
-				sell: {labour: 25},
+				cost: {labour: 10, knowledge: 10},
+				sell: {labour: 20},
 				effect: 50
 			}
 		},
@@ -878,7 +877,7 @@ data = {
 			name: 'Susurration',
 			description: 'The constant drone of your voice will motivate your followers.',
 			show_in: {tab: 'temple', section: 'visions'},
-			cost:  {influence: 160},
+			cost:  {influence: 140},
 			atoms: [
 				{
 					target: 'influence',
@@ -1219,7 +1218,7 @@ data = {
 					target: 'humans',
 					type: 'death_xp',
 					order: 400,
-					func: function (x) {
+					func: function (x, me) {
 						return x+1;
 					}
 				}
@@ -1338,7 +1337,7 @@ data = {
 					type: 'labour_effect',
 					target: 'labourer',
 					order: 400,
-					func: function (z) {
+					func: function (z, me) {
 						return z + 100
 					}
 				}
@@ -1379,7 +1378,7 @@ data = {
 					type: 'food_use',
 					target: 'humans',
 					order: 700,
-					func: function (x) {
+					func: function (x, me) {
 						return x * .8
 					}
 				}
@@ -1406,7 +1405,7 @@ data = {
 					type: 'hunter_effect',
 					target: 'armory',
 					order: 400,
-					func: function (x) {return x + 10}
+					func: function (x, me) {return x + 10}
 				}
 			]
 		},
@@ -1415,6 +1414,7 @@ data = {
 			name: 'Trapping',
 			age: 2,
 			locks: 1,
+			cvars: {food_effect: 100},
 			description: 'Trapping allows your followers to catch beasts to use for sustenance.',
 			announce: 'Your followers can set traps for herds of beasts, converting labour into sustenance.',
 			show_in: {tab: 'research', section: 'technology'},
@@ -1437,19 +1437,19 @@ data = {
 							type: 'tick',
 							target: 'labour',
 							order: 400,
-							seed_func: function (x) {return x - 50}
+							seed_func: function (x) {return x - 25}
 						},
 						{
 							type: 'tick',
 							target: 'food',
 							order: 400,
-							seed_func: function (x) {return x + 100}
+							seed_func: function (x, me) {return x + me.parent.trapping_effect}
 						},
 						{
 							type: 'capture',
 							target: 'beasts',
 							order: 400,
-							seed_func: function (x) {return x + .5}
+							seed_func: function (x) {return x + 1/3}
 						}
 					]
 				});
@@ -1632,7 +1632,7 @@ data = {
 			age: 4,
 			locks: 2,
 			description: 'Smelting and working with metals to make better tools.',
-			announce: 'Your followers can create a smelter which allows manufacturers to produce fabrications at an increase rate, but consume components.',
+			announce: 'Your followers can create a smelter which allow more fabrications to be stored.',
 			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
 			cost_factor: {labour: 50, fabrications: 100, knowledge: 5},
@@ -1700,7 +1700,7 @@ data = {
 					type: 'learnedness',
 					target: 'heavens',
 					order: 20,
-					func: function (x) {return 2}
+					func: function (x, me) {return 2}
 				}
 			]
 		},
@@ -1716,6 +1716,7 @@ data = {
 			cost_factor: {labour: 100, food: 20},
 			apply: function () {
 				it.works.animal_pen.unlock();
+				it.species.beasts.unlock();
 				it.junction.unlock('cult', 'beasts');
 			},
 			unlocks: ['riding', 'plow']
@@ -1757,7 +1758,7 @@ data = {
 					type: 'efficiency',
 					target: 'beasts_farmer',
 					order: 400,
-					func: function (x) {return x + 4}
+					func: function (x, me) {return x + 4}
 				}
 			]
 			
@@ -1768,7 +1769,7 @@ data = {
 			age: 5,
 			locks: 1,
 			description: 'The ability to forge iron, a more durable material than bronze.',
-			announce: 'Your followers can construct an ironworks which increases the effectiveness of smelters.',
+			announce: 'Your followers can construct an ironworks which allow manufacturers to create fabrications faster.',
 			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1.5,
 			cost_factor: {labour: 100, fabrications: 100},
@@ -1805,16 +1806,6 @@ data = {
 			fixed_cost: {influence: 100},
 			apply: function () {
 				it.resources.culture.unlock();
-				var village_currency_atom = {
-					type: 'tick',
-					target: 'currency',
-					order: 400,
-					seed_func: function (x, me) {
-						return x + (it.interests.village.currency_return + it.governances[me.governance].currency) * me.population;
-					},
-					disabled: 1,
-					id: 'civil_service'
-				}
 				var village_influence_atom = {
 					type: 'gather',
 					target: 'influence',
@@ -1855,7 +1846,6 @@ data = {
 					disabled: 1,
 					id: 'civil_service'
 				}
-				it.interests.village.new_atom(village_currency_atom);
 				it.interests.village.new_atom(village_influence_atom);
 				it.interests.village.new_atom(village_culture_atom);
 				it.interests.village.new_atom(village_culture_max_atom);
@@ -1874,8 +1864,12 @@ data = {
 						var i;
 						for (i in my_interest.atoms) {
 							if (my_interest.atoms[i].id == 'civil_service') my_interest.atoms[i].disabled = !on
-						}						
-						if (on) my_interest.consoles.add('governance');
+						}
+						H.apply_atoms(my_interest);
+						if (on) {
+							my_interest.consoles.add('governance');
+							my_interest.governance='non_governance';
+						}
 						else my_interest.consoles.remove('governance');
 					}
 				});
@@ -1981,7 +1975,7 @@ data = {
 					type: 'inadequacy',
 					targets: ['hovel', 'house'],
 					order: 700,
-					func: function (x) {return x * .9}
+					func: function (x, me) {return x * .9}
 				}
 			],
 			apply: function () {
@@ -2081,8 +2075,8 @@ data = {
 					type: 'housing_decay',
 					target: 'humans',
 					order: 10,
-					func: function () {
-						return 1 / (it.works.bonfire.level/2 + 4)
+					func: function (x, me) {
+						return 1 / (me.level/2 + 4)
 					}
 				}
 			],
@@ -2108,16 +2102,16 @@ data = {
 					type: 'max',
 					target: 'humans',
 					order: 400,
-					func: function hovel_housing (x) {
-						return x + it.works.hovel.level
+					func: function hovel_housing (x, me) {
+						return x + me.level
 					}
 				},
 				{
 					type: 'disease',
 					target: 'humans',
 					order: 400,
-					func: function hovel_disease (x) {
-						return x + it.works.hovel.level * it.works.hovel.inadequacy
+					func: function hovel_disease (x, me) {
+						return x + me.level * me.inadequacy
 					}
 				}
 			],
@@ -2434,7 +2428,7 @@ data = {
 		smelter: {
 			object_type: 'work',
 			name: 'Smelter',
-			description: 'Consumes rudiments to increase the rate at which your manufacturers produce fabrications.',
+			description: 'Lighter, stronger fabrications can be stored more efficiently in warehousing.',
 			show_in: {tab: 'works', section: 'buildings'},
 			cvars: {fabrication_storage_effect: 10},
 			saves: ['processed_ore', 'fabrications'],
@@ -2459,22 +2453,23 @@ data = {
 		ironworks: {
 			object_type: 'work',
 			name: 'Ironworks',
-			description: 'I don\'t know what this does or even if it will be a thing.',
+			description: 'Increases the rate of production of fabrications.',
+			cvars: {fabrication_production_effect: .15},
 			show_in: {tab: 'works', section: 'buildings'},
 			cost_function: function (me) {
 				return {
-					labour: Math.min(me.level+1 , 4) * 50,
-					fabrications: 50 * (me.level/2+1) * Math.pow(1.15, me.level),
-					knowledge: 5 * (me.level/2+1) * Math.pow(1.05, me.level)
+					labour: Math.min(me.level+1 , 5) * 100,
+					fabrications: 200 * (me.level/2+1) * Math.pow(1.15, me.level),
+					ore: 25 * (me.level/2+1) * Math.pow(1.05, me.level)
 				}
 			},
 			atoms: [
 				{
-					type: 'effect',
-					target: 'warehouse_fabrications',
+					type: 'tick',
+					target: 'fabrications',
 					order: 700,
 					func: function ironworks_effect (x) {
-						return x * (1 + .1 * it.works.ironworks.level);
+						return x<=0 ? x : x * (1 + it.works.ironworks.fabrication_production_effect * it.works.ironworks.level);
 					}
 				}
 			]
@@ -2510,7 +2505,7 @@ data = {
 			cost_function: function (me) {
 				return {
 					corpses: me.level+1,
-					labour: Math.min(me.level+1,5) * 10, 
+					labour: Math.min(me.level+1,5) * 8, 
 					fabrications: 5 * (me.level + 1) * Math.pow(1.05, me.level)
 				}
 			},
@@ -2615,8 +2610,8 @@ data = {
 					type: 'max_maps',
 					target: 'world_map',
 					order: 400,
-					func: function (x) {
-						return x + it.improvements.maps.level;
+					func: function (x, me) {
+						return x + me.level;
 					}
 				}
 			],
@@ -2646,9 +2641,8 @@ data = {
 					type: 'influence_gain',
 					target: 'humans',
 					order: 400,
-					func: function (x) {
-						var l = it.improvements.drama.level;
-						return x + l*.2
+					func: function (x, me) {
+						return x + me.level * .2
 					}
 				}
 			]
@@ -2699,8 +2693,8 @@ data = {
 					type: 'installments',
 					targets: ['hovel', 'shed'],
 					order: 400,
-					func: function (x) {
-						return x + it.improvements.cranes.level
+					func: function (x, me) {
+						return x + me.level
 					}
 				}
 			]
@@ -2727,7 +2721,7 @@ data = {
 					type: 'base_interests',
 					target: 'world_map',
 					order: 400,
-					func: function (x) {return x + it.improvements.optics.level}
+					func: function (x, me) {return x + me.level}
 				}
 			],
 			apply: function () {
@@ -3297,6 +3291,7 @@ data = {
 			object_type: 'interest',
 			name: 'Beasts',
 			types: {land: 1},
+			cvars: {trapping_effect: 100},
 			icon: '&#9800;&#65038;',
 			description: 'A feeding ground for wild beasts. Increases the effectiveness of hunters.',
 			description_expired: 'A herd of beasts used to graze here. There is no sign of them.',
@@ -3440,7 +3435,7 @@ data = {
 			types: {land:1},
 			icon: '&#9978;&#65038;',
 			unlocked: true,
-			cvars: {progress: 0, science_bonus: 0, prosperity: 0, control_cost: 0, currency_return: 0},
+			cvars: {progress: 0, science_bonus: .3, prosperity: 0.05, control_cost: 5, currency_return: 0},
 			saves: ['governance', 'population_bits', 'population'],
 			description: 'Exchanging goods and ideas with villagers increases the effectiveness of research.',
 			description_expired: 'Structures here suggest that people lived here not too long ago, but no one can be found.',
@@ -3488,6 +3483,14 @@ data = {
 					seed_func: function (x, me) {
 						return x + (it.interests.village.science_bonus + it.governances[me.governance].science) * me.population;
 					}
+				},
+				{
+					type: 'tick',
+					target: 'currency',
+					order: 400,
+					seed_func: function (x, me) {
+						return x + (it.interests.village.currency_return + it.governances[me.governance].currency) * me.population;
+					}
 				}
 			],
 			discover: ['civil_service']
@@ -3530,9 +3533,9 @@ data = {
 		},
 		non_governance: {
 			object_type: 'governance',
-			name: 'Non-interference',
-			prosperity: 0.05,
-			science: 0.3,
+			name: 'No Interference',
+			prosperity: 0,
+			science: 0,
 			currency: 0,
 			control: 0,
 			trade: 1,
@@ -3541,7 +3544,7 @@ data = {
 		hedonism: {
 			object_type: 'governance',
 			name: 'Hedonism',
-			prosperity: 0.2,
+			prosperity: 0.15,
 			science: 0,
 			currency: 0,
 			control: 0,
@@ -3659,10 +3662,15 @@ data = {
 				me.ui.add(me.ui_lines.desc);
 				me.ui_lines.dropdown = H.e('div', 0, 'node_line');
 				it.add_dropdown(me, 'type', {
-					name: 'Governance Model',
+					name: 'Zeitgeist',
 					show_in: me.ui_lines.dropdown
 				});
 				me.ui.add(me.ui_lines.dropdown);
+				function zeitgeist_tooltip (e) {
+					it.tooltip.show(e, 'Select a philosophy to influence the people of this place.', 'Zeitgeist');
+				}
+				me.ui_lines.dropdown.addEventListener('mouseover', zeitgeist_tooltip);
+				me.ui_lines.dropdown.addEventListener('mouseout', it.tooltip.hide);
 				var i;
 				function add_option (x) {
 					me.dropdowns.type.add_option(x, it.governances[x].name, function () {return it.governances[x].unlocked});
