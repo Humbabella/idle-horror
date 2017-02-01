@@ -170,8 +170,8 @@ data = {
 		worshipper: {
 			object_type: 'job',
 			name: 'Worshipper',
-			tooltip: function (me, m) {
-				return 'Generates ' + me.influence_effect * 30 * m + ' infuence per Epoch.'
+			tooltip: function (me) {
+				return 'Generates ' + me.influence_effect * 30 + ' infuence per Epoch.'
 			},
 			cvars: {influence_effect: 15},
 			unlocked: true,
@@ -189,8 +189,8 @@ data = {
 		hunter: {
 			object_type: 'job',
 			name: 'Hunter',
-			tooltip: function (me, m) {
-				return 'Generates ' + me.food_effect * m + ' sustenance per Epoch.'
+			tooltip: function (me) {
+				return 'Generates ' + me.food_effect + ' sustenance per Epoch.'
 			},
 			guild: true,
 			generates: {food: 200}
@@ -198,8 +198,8 @@ data = {
 		farmer: {
 			object_type: 'job',
 			name: 'Farmer',
-			tooltip: function (me, m) {
-				return 'Produces ' + me.farmer_production * m + ' per epoch if you have sufficient farms to hold all production.'
+			tooltip: function (me) {
+				return 'Produces ' + me.farmer_production + ' per epoch if you have sufficient farms to hold all production.'
 			},
 			guild: true,
 			cvars: {farmer_production: 400},
@@ -218,8 +218,8 @@ data = {
 			object_type: 'job',
 			name: 'Labourer',
 			generates: {labour: 50, ore: 0, rarities: 0, food: 0},
-			tooltip: function (me, m) {
-				var t = 'Generates '+me.labour_effect*m+' labour per Epoch, and increases the maximum amount of labour that can be stored by the same amount.<br><br>If labourers are unassigned, existing labour will not be lost, but total labour will not increase as long as it is above the maximum.';
+			tooltip: function (me) {
+				var t = 'Generates '+me.labour_effect+' labour per Epoch, and increases the maximum amount of labour that can be stored by the same amount.<br><br>If labourers are unassigned, existing labour will not be lost, but total labour will not increase as long as it is above the maximum.';
 				if (me.fragment_effect)  t+='<br><br>Each labourer will also find '+me.fragment_effect+' per Epoch.'
 				return t;
 			},
@@ -239,8 +239,8 @@ data = {
 			object_type: 'job',
 			name: 'Manufacturer',
 			generates: {fabrications: 50},
-			tooltip: function (me,m) {
-				return 'Generates '+me.fabrications_effect*m+' fabrications per Epoch.'
+			tooltip: function (me) {
+				return 'Generates '+me.fabrications_effect+' fabrications per Epoch.'
 			},
 			guild: true,
 		},
@@ -248,8 +248,8 @@ data = {
 			object_type: 'job',
 			name: 'Contemplative',
 			generates: {knowledge: 25},
-			tooltip: function (me,m) {
-				return 'Generates '+me.knowledge_effect*m+' ingenuity per Epoch.'
+			tooltip: function (me) {
+				return 'Generates '+me.knowledge_effect+' ingenuity per Epoch.'
 			},
 			guild: true,
 		},
@@ -474,8 +474,7 @@ data = {
 			name: 'Ghouls',
 			default_job: 'labourer',
 			jobs: {
-				labourer: {base_efficiency: 10, multiplier: .8},
-				worshipper: {base_efficiency: 1/0, multiplier: .5}
+				labourer: {base_efficiency: 10, multiplier: .65}
 			},
 			food_use: 3,
 			food_type: 'corpses',
@@ -1059,6 +1058,7 @@ data = {
 					},
 					max: 1/10,
 					result: function (args) {
+						it.unlock('rarities');
 						var r = 0;
 						while (H.r() < (1 - 1/me.accumulated_rarities)) {
 							r++;
@@ -2079,8 +2079,7 @@ data = {
 				necromancy: {
 					name: 'Necromancy',
 					description: 'Animating the dead.',
-					cost: {influence: 500, foreboding: 10},
-					installments: 5,
+					cost: {influence: 250, foreboding: 5},
 					apply: function () {
 						it.junction.unlock('cult', 'ghouls');
 						it.acts.animate_dead.unlock();
@@ -2444,11 +2443,12 @@ data = {
 			show_in: {tab: 'works', section: 'buildings'},
 			cvars: {fabrication_storage_effect: 10},
 			saves: ['processed_ore', 'fabrications'],
+			installments: 2,
 			cost_function: function (me) {
 				return {
 					labour: Math.min(me.level+1,5) * 40,
 					fabrications: 35 * (me.level+1) * Math.pow(1.1, me.level),
-					ore: 5 * (me.level/2+1) * Math.pow(1.25, me.level)
+					ore: 8 * (me.level/2+1) * Math.pow(1.15, me.level)
 				}
 			},
 			atoms: [
@@ -2468,11 +2468,12 @@ data = {
 			description: 'Increases the rate of production of fabrications.',
 			cvars: {fabrication_production_effect: .15},
 			show_in: {tab: 'works', section: 'buildings'},
+			installments: 3,
 			cost_function: function (me) {
 				return {
-					labour: Math.min(me.level+1 , 5) * 40,
-					fabrications: 75 * (me.level*3/4+1) * Math.pow(1.15, me.level),
-					ore: 10 * (me.level/2+1) * Math.pow(1.25, me.level)
+					labour: Math.min(me.level+1 , 5) * 60,
+					fabrications: 40 * (me.level*3/4+1) * Math.pow(1.15, me.level),
+					ore: 10 * (me.level/2+1) * Math.pow(1.15, me.level)
 				}
 			},
 			atoms: [
