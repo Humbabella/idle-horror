@@ -1322,18 +1322,11 @@ it.constructors = {
 				},
 				enumerable: true
 			},
-			unlocked: {
-				get: function () {return work.unlocked},
-				set: function (x) {
-					if (x) work.unlock();
-				},
-				enumerable: true
-			},
 			upgrades: {
 				get: function () {
 					var i, r = {};
 					for (i in work.upgrades) {
-						r[i] = {paid: work.upgrades[i].cost.paid, bought: work.upgrades[i].bought, installments: work.upgrades[i].cost.installments.made};
+						if (work.upgrades[i].bought) r[i] = {paid: work.upgrades[i].cost.paid, bought: work.upgrades[i].bought};
 					}
 					return r
 				},
@@ -1342,7 +1335,6 @@ it.constructors = {
 					for (i in v) {
 						if (v[i].bought) work.upgrades[i].acquire();
 						if (v[i].paid) work.upgrades[i].cost.paid = v[i].paid;
-						if (v[i].installments) work.upgrades[i].cost.installments.made = v[i].installments;
 					}
 				},
 				enumerable: true
@@ -1394,8 +1386,7 @@ it.constructors = {
 				description: up_args.description,
 				cost: {cost: up_args.cost, installments: {made: 0, max: up_args.installments}},
 				atoms: up_args.atoms,
-				apply: up_args.apply,
-				level: up_args.level
+				apply: up_args.apply
 			}
 			
 			up.ui_line = H.e('div', ui.upgrades, 'upgrade_line');
@@ -1444,7 +1435,6 @@ it.constructors = {
 			if (up_args.unlocked) up.unlock();
 			
 			up.ui_line.addEventListener('mouseover', up.show_tooltip);
-			up.ui_line.addEventListener('mouseout', it.tooltip.hide);
 			up.ui_button.addEventListener('click', up.buy);
 			
 			work.upgrades[up_id] = up;
@@ -2192,7 +2182,7 @@ it.constructors = {
 				}
 			);
 			species.jobs[z].tooltip = function () {
-				var t = it.jobs[z].tooltip(it.jobs[z], species.jobs[z].multiplier);
+				var t = it.jobs[z].tooltip(it.jobs[z]);
 				if (species.show_efficiency) {
 					var x = species.jobs[z].count, k = species.jobs[z].efficiency;
 					var margin = Math.round(((k-1)*x+k)*Math.pow(k, x-1)*100);
