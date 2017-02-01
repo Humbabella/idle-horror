@@ -77,6 +77,10 @@ body {background-color: #666}
 .tall{height: 23px}
 .node_footer{height: 9px}
 
+.upgrade_line {position: relative; margin-bottom: 7px}
+.upgrade_name {padding-top: 2px}
+.upgrade_button{position: absolute; right: 0px; top: 0px; border: 1px solid #000; height: 21px; overflow:hidden; border-radius: 3px; text-align: center; width: 50%}
+
 .task_button_plus{right: 25px; width: 20px; background-color: #ddd; height: 20px; font-size: 17px}
 .task_button_minus{right: 0px; width: 20px; background-color: #ddd; height: 20px; font-size: 17px}
 

@@ -1146,12 +1146,14 @@ it.constructors = {
 			substitutions: args.substitutions || {fabrications: {currency: 1}, knowledge: {currency: 2}},
 			description: args.description,
 			level: 0,
+			max_level: args.max_level || false,
 			save_id: id,
 			save_parameters: {},
 			percent_complete: 100,
 			build_word: args.build_word || 'Construct',
 			cost_function: args.cost_function,
-			cost: {installments: {made: 0}}
+			cost: {installments: {made: 0}},
+			upgrades: {}
 		};
 		
 		H.attach_atoms(work, args.atoms);
@@ -1162,7 +1164,7 @@ it.constructors = {
 			set: function (v) {description = v; ui.desc.innerHTML = H.c(v);}
 		})
 		
-		H.add_cvar(work, 'installments', 1);
+		H.add_cvar(work, 'installments', args.installments || 1);
 
 		function reset_cost() {
 			work.cost.cost = work.cost_function(work);
@@ -1183,37 +1185,38 @@ it.constructors = {
 		var ui = {}
 		
 		ui.name = H.e('td', 0, 'node_title', work.name);
-		if (!args.toggle) {
-			ui.button = H.e('td', 0, 'node_button node_button_wide');
-			it.add_button_animation(ui.button);
-		} else {
-			ui.plus = H.e('td', 0, 'node_button node_button_plus', '+');
-			ui.minus = H.e('td', 0, 'node_button node_button_minus', '-')
-			ui.button = H.e('td', 0, 'node_button node_button_med');
-			it.add_button_animation(ui.button);
-			it.add_button_animation(ui.minus);
-			it.add_button_animation(ui.plus);
-		}
+		ui.button = H.e('td', 0, 'node_button node_button_wide');
+		it.add_button_animation(ui.button);
 		
 		ui.fill = H.e('div', ui.button, 'node_button_fill');
 		ui.fill.style.left = '100%';
 		ui.button_text = H.e('div', ui.button, 'node_button_text', work.build_word);
 		ui.cost = H.e('div', 0, 'node_line');
 		ui.desc = H.e('div', 0, 'node_line', work.description);
+		ui.upgrades = H.e('div', 0, 'node_line');
+		ui.complete_upgrades = H.e('div', 0, 'node_line');
 		
 		work.ui.add(ui.name, 'heading');
-		if (!args.toggle) {
-			work.ui.add(ui.button, 'heading');
-		} else {
-			work.ui.add(ui.plus, 'heading');
-			work.ui.add(ui.minus, 'heading');
-			work.ui.add(ui.button, 'heading');
-		}
+		work.ui.add(ui.button, 'heading');
 		work.ui.add(ui.cost);
 		work.ui.add(ui.desc);
 		
 		work.update = function () {
 			work.ui.update();
+		}
+		
+		ui.name.update = function () {
+			if (work.max_level&&work.level==work.max_level) {
+				var i, upgrade = false;
+				for (i in work.upgrades) {
+					if (work.upgrades[i].unlocked&&!work.upgrades[i].bought) {
+						upgrade = true;
+						break;
+					}
+				}
+				if (upgrade) ui.name.innerHTML = work.name + ' (Upgrades Available)';
+				else ui.name.innerHTML = work.name + ' (Complete)';
+			}
 		}
 		
 		ui.button.update = function () {
@@ -1237,12 +1240,13 @@ it.constructors = {
 		
 		it.junction.add_node(work, true, work.show_in.tab, work.show_in.section)
 		
-		function apply_atoms (args) {
-			H.apply_atoms(work)
+		function update_atoms_on_cvar () {
+			if (work.bought) work.apply_atoms();
 		}
+		
 		for (i in args.cvars) {
 			H.add_cvar(work, i, args.cvars[i])
-			it.cvars[i][work.id].update.add_result(apply_atoms)
+			it.cvars[i][work.id].update.add_result(update_atoms_on_cvar)
 		}
 		
 		work.unlock = function (no_show) {
@@ -1253,6 +1257,7 @@ it.constructors = {
 		
 		work.buy = function () {
 			ui.button.animate();
+			if (work.max_level&&work.level>=work.max_level) return;
 			var c = it.dosh.consider(work.cost)
 			if (c.cant_pay) return false;
 			c.pay();
@@ -1270,66 +1275,27 @@ it.constructors = {
 			if (typeof(level)!='number') level = work.level+1;
 			work.level = level;
 			work.draw_name();
-			apply_atoms();
+			work.apply_atoms();
 			reset_cost();
+			if (work.max_level&&work.level>=work.max_level) {
+				ui.cost.style.display = 'none';
+				ui.button.style.display = 'none';
+			}
+			work.ui.add(ui.upgrades);
+			work.ui.add(ui.complete_upgrades);
 			if (args.apply) args.apply(work);
+			var i;
+			for (i in work.upgrades) {
+				if (work.upgrades[i].level<=work.level) work.upgrades[i].unlock();
+			}
 			work.installments.made = 0;
 		}
 
-		work.draw_name = args.toggle ? 
-			function () {
-				ui.name.innerHTML = work.name + ' (' + work.on + '/' + work.level + ')';
-			} :
-			function () {
+		work.draw_name = function () {
 				ui.name.innerHTML = work.name + ' (' + work.level + ')';
 			}
 			
 		ui.button.addEventListener('click', work.buy);
-		
-		if (args.toggle) {
-			var on = 0;
-			work.shutoff = args.toggle.shutoff;
-			Object.defineProperty(work, 'on', {
-				get: function () {return on},
-				set: function (v) {
-					on = v;
-					ui.name.innerHTML = work.name + ' (' + work.on + '/' + work.level + ')';
-					apply_atoms();
-				}
-			})
-			
-			work.plus = function () {
-				ui.plus.animate();
-				if (work.on>=work.level) return;
-				work.on++;
-			}
-		
-			work.minus = function () {
-				ui.minus.animate();
-				if (work.on<=0) return;
-				work.on--;
-			}
-			
-			if (work.shutoff) {
-				work.check_shutoff = function () {
-					if (work.shutoff(work)) {
-						work.on = 0;
-						work.draw_name();
-						apply_atoms();
-					}
-				}
-				it.each_tick.add_result(work.check_shutoff);
-			}
-			
-			ui.plus.addEventListener('click', work.plus);
-			ui.minus.addEventListener('click', work.minus);
-			
-			Object.defineProperty(work.save_parameters, 'on', {
-				get: function () {return work.on},
-				set: function (v) {work.on = v},
-				enumerable: true
-			})
-		}
 		
 		Object.defineProperties (work.save_parameters, {
 			level: {
@@ -1343,7 +1309,8 @@ it.constructors = {
 				get: function () {return work.cost},
 				set: function (x) {
 					if (x) {
-						work.cost = H.d(x);
+						work.cost.paid = H.d(x.paid);
+						work.cost.installments.made = x.installments.made;
 					}
 				},
 				enumerable: true
@@ -1352,6 +1319,23 @@ it.constructors = {
 				get: function () {return work.percent_complete},
 				set: function (x) {
 					if (x) work.percent_complete = x;
+				},
+				enumerable: true
+			},
+			upgrades: {
+				get: function () {
+					var i, r = {};
+					for (i in work.upgrades) {
+						if (work.upgrades[i].bought) r[i] = {paid: work.upgrades[i].cost.paid, bought: work.upgrades[i].bought};
+					}
+					return r
+				},
+				set: function (v) {
+					var i;
+					for (i in v) {
+						if (v[i].bought) work.upgrades[i].acquire();
+						if (v[i].paid) work.upgrades[i].cost.paid = v[i].paid;
+					}
 				},
 				enumerable: true
 			}
@@ -1373,10 +1357,6 @@ it.constructors = {
 			add_save_parameter (args.saves[i])
 		}
 		
-		if (args.toggle) {
-			add_save_parameter (on);
-		}
-		
 		if (args.dosh) {
 			work.dosh = {
 				id: args.dosh.id,
@@ -1395,6 +1375,75 @@ it.constructors = {
 			it.dosh.register(work.dosh)
 		}
 		
+		work.unlock_upgrade = function (up_id) {
+			work.upgrades[up_id].unlock();
+		}
+		
+		function construct_upgrade(up_args, up_id) {
+			var up = {
+				id: up_id,
+				name: up_args.name,
+				description: up_args.description,
+				cost: {cost: up_args.cost, installments: {made: 0, max: up_args.installments}},
+				atoms: up_args.atoms,
+				apply: up_args.apply
+			}
+			
+			up.ui_line = H.e('div', ui.upgrades, 'upgrade_line');
+			up.ui_line.style.display = 'none';
+			up.ui_name = H.e('div', up.ui_line, 'upgrade_name', up.name);
+			up.ui_button = H.e('div', up.ui_line, 'upgrade_button', 'Upgrade');
+			
+			it.add_button_animation(up.ui_button);
+			
+			up.tooltip = function () {
+				var t='';
+				if (!up.bought) t+=it.dosh.consider(up.cost).format + '<br><br>';
+				t+=up.description;
+				return t				
+			}
+			
+			up.show_tooltip = function (e) {
+				it.tooltip.show(e, up.tooltip, up.name);
+			}
+			
+			up.buy = function () {
+				up.ui_button.animate();
+				var c = it.dosh.consider(up.cost)
+				if (c.cant_pay) return false;
+				c.pay();
+				if (c.is_paid) {
+					up.acquire()
+				}
+			}
+			
+			up.acquire = function () {
+				up.bought = 1;
+				up.ui_button.style.display = 'none';
+				up.ui_name.innerHTML = up.name + ' (Complete)';
+				H.attach_atoms(work, up.atoms);
+				work.apply_atoms();
+				ui.complete_upgrades.appendChild(up.ui_line);
+				if (up.apply) up.apply(work);
+			}
+			
+			up.unlock = function () {
+				up.ui_line.style.display = 'block'
+				up.unlocked = 1;
+			}
+			
+			if (up_args.unlocked) up.unlock();
+			
+			up.ui_line.addEventListener('mouseover', up.show_tooltip);
+			up.ui_button.addEventListener('click', up.buy);
+			
+			work.upgrades[up_id] = up;
+		}
+		
+		for (i in args.upgrades) {
+			construct_upgrade(args.upgrades[i], i)
+		}
+				
 		if (args.construct) args.construct(work)
 		H.register_for_save(work)
 	
@@ -2331,7 +2380,7 @@ it.ids = {};
 var id, p;
 for (id in data.object_data) {
 	p = plurals[data.object_data[id].object_type] || data.object_data[id].object_type + 's'
-	it.ids[id] = it.constructors[data.object_data[id].object_type](data.object_data[id], id);
 	if (!it[p]) it[p]={};
+	it.ids[id] = it.constructors[data.object_data[id].object_type](data.object_data[id], id);
 	it[p][id] = it.ids[id];
 }

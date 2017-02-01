@@ -798,6 +798,7 @@ it.heavens = new function () {
 	
 	H.add_cvar(heavens, 'foreboding', 1);
 	H.add_cvar(heavens, 'learnedness', 0);
+	H.add_cvar(heavens, 'ominousness', 1);
 		
 	function get_new_sign () {
 		var i, a=[], C=10;
@@ -869,6 +870,14 @@ it.heavens = new function () {
 	H.add_action(heavens, 'click_omen');
 	H.add_action(heavens, 'enable_omen');
 	
+	function apply_omen (args) {
+		if (it.omens[it.heavens.omen.id].apply) it.omens[it.heavens.omen.id].apply();
+	}
+	function apply_omen_atoms (args) {
+		it.heavens.omen.state = 'active';
+		it.heavens.omen_atoms(true);
+	}
+	
 	function gain_foreboding (args) {
 		it.resources.foreboding.unlock();
 		var f = args.foreboding || 1;
@@ -881,6 +890,9 @@ it.heavens = new function () {
 	
 	heavens.click_omen.add_result(gain_foreboding, 600);
 	heavens.click_omen.add_result(heavens.enable_omen, 900);
+	heavens.click_omen.add_result(apply_omen, 400);
+	heavens.enable_omen.add_result(apply_omen_atoms, 300);
+
 	
 	function redraw_omen (args) {
 		if (heavens.omen.state == 'active') {
@@ -1938,10 +1950,10 @@ it.world_map = new function () {
 		}
 		
 		if (map.interests==-1) {
-			var r = H.r() / (world_map.interest_quality + .2 * tile_number);
+			var r = H.r() / (1 + world_map.interest_quality + .2 * tile_number);
 			var i;
 			for (i=0; i<world_map.map_qualities.length; i++) {
-				r-=world_map.map_qualities[0];
+				r-=world_map.map_qualities[i];
 				if (r<=0) break;
 			}
 			map.interests = world_map.map_qualities.length - i;

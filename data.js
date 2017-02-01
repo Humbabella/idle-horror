@@ -103,7 +103,7 @@ data = {
 			sections: [
 				{
 					id: 'buildings',
-					name: 'Buildings'
+					name: 'Enclave'
 				},
 				{
 					id: 'monuments',
@@ -831,8 +831,8 @@ data = {
 			apply: function () {
 				it.junction.unlock('heavens');
 				it.techs.agriculture.unlock({by: 'the_stars'});
-				it.works.calendar.unlock();
-				//it.deities.mim_ktokh.awake = 1;
+				it.unlock('calendar');
+				it.deities.mim_ktokh.awake = 1;
 			}
 		},
 		grim_feast: {
@@ -851,25 +851,6 @@ data = {
 					}
 				}
 				it.species.humans.counters.starvation.outcome.add_result(eat_corpse, 100);
-			}
-		},
-		necromancy: {
-			object_type: 'vision',
-			name: 'Necromancy',
-			description: 'Animating the dead.',
-			show_in: {tab: 'temple', section: 'visions'},
-			cost: {influence: 250, graves: 10, foreboding: 5},
-			apply: function () {
-				//it.improvements.grimoire.unlock();
-				it.junction.unlock('cult', 'ghouls');
-				it.acts.animate_dead.unlock();
-				it.species.ghouls.unlock();
-				it.works.mausoleum.atoms.push({
-					type: 'max',
-					target: 'ghouls',
-					order: 400,
-					func: function (x) {return x + Math.floor(it.works.mausoleum.level/5)}
-				})
 			}
 		},
 		babbling: {
@@ -907,7 +888,6 @@ data = {
 			show_in: {tab: 'temple', section: 'visions'},
 			cost: {influence: 30},
 			apply: function () {
-				it.techs.theology.unlock({by: 'the_world'});
 				it.acts.expedite.unlock();
 				it.junction.unlock('exploration', 'maps');
 				it.junction.unlock('exploration', 'interests');
@@ -1078,6 +1058,7 @@ data = {
 					},
 					max: 1/10,
 					result: function (args) {
+						it.unlock('rarities');
 						var r = 0;
 						while (H.r() < (1 - 1/me.accumulated_rarities)) {
 							r++;
@@ -1304,6 +1285,7 @@ data = {
 			apply: function () {
 				it.works.idol.unlock();
 				it.resources.corpses.unlock();
+				it.works.calendar.unlock_upgrade('time_corpse_rot')
 			},
 			unlocks: ['burial', 'astrology']
 		},
@@ -1330,15 +1312,14 @@ data = {
 			announce: 'Your labourers are far more efficient.',
 			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
-			cost_factor: {labour: 100},
-			fixed_cost: {fabrications: 5},
+			cost_factor: {labour: 50, fabrications: 50},
 			atoms: [
 				{
 					type: 'labour_effect',
 					target: 'labourer',
 					order: 400,
 					func: function (z, me) {
-						return z + 100
+						return z + 50
 					}
 				}
 			],
@@ -1358,7 +1339,7 @@ data = {
 			fixed_cost: {labour: 5, fabrications: 5},
 			no_knowledge: 1,
 			apply: function () {
-				it.works.bonfire.unlock();
+				it.unlock('bonfire');
 			},
 			unlocks: ['oral_history']
 		},
@@ -1469,18 +1450,6 @@ data = {
 			cost_factor: {influence: 100},
 			apply: function () {
 				it.works.oracle.unlock();
-				function apply_omen (args) {
-					if (it.omens[it.heavens.omen.id].apply) it.omens[it.heavens.omen.id].apply();
-				}
-				function apply_omen_atoms (args) {
-					it.heavens.omen.state = 'active';
-					it.heavens.omen_atoms(true);
-				}
-				it.heavens.click_omen.add_result(apply_omen, 400);
-				it.heavens.enable_omen.add_result(apply_omen_atoms, 300);
-				if (it.heavens.omen.state=='active') {
-					apply_omen_atoms();
-				}
 			},
 			atoms: [
 				{
@@ -1488,6 +1457,12 @@ data = {
 					target: 'heavens',
 					order: 10,
 					func: function (x) {return 1}
+				},
+				{
+					type: 'ominousness',
+					target: 'heavens',
+					order: 400,
+					func: function (x) {return x+1}
 				}
 			],
 			unlocks: ['theology']
@@ -1652,14 +1627,14 @@ data = {
 			announce: 'Your followers can become miners, who very quickly gather resources from explored regions.',
 			show_in: {tab: 'research', section: 'technology'},
 			time_factor: 1,
-			cost_factor: {labour: 200},
+			cost_factor: {labour: 100},
 			fixed_cost: {ore: 1},
 			apply: function () {
 				it.warehousing.warehouse_ore.unlock();
 				it.interests.quarry.new_effort({
 					name: 'Dig Mine',
 					icon: 'M',
-					cost: {labour: 100},
+					cost: {labour: 50},
 					description: 'Create a mine at this site to extract more materials.',
 					length: function () {return 0.5},
 					apply: function (me, my_interest) {
@@ -1771,8 +1746,8 @@ data = {
 			description: 'The ability to forge iron, a more durable material than bronze.',
 			announce: 'Your followers can construct an ironworks which allow manufacturers to create fabrications faster.',
 			show_in: {tab: 'research', section: 'technology'},
-			time_factor: 1.5,
-			cost_factor: {labour: 100, fabrications: 100},
+			time_factor: 1,
+			cost_factor: {labour: 75, fabrications: 75},
 			apply: function () {
 				it.works.ironworks.unlock();
 			}
@@ -1802,8 +1777,7 @@ data = {
 			announce: 'Your followers can now infiltrate settlements to manipulate and exploit them.',
 			show_in: {tab: 'research', section: 'society'},
 			time_factor: 1,
-			cost_factor: {knowledge: 10},
-			fixed_cost: {influence: 100},
+			cost_factor: {knowledge: 5, influence: 80},
 			apply: function () {
 				it.resources.culture.unlock();
 				var village_influence_atom = {
@@ -2023,13 +1997,8 @@ data = {
 			name: 'Stone Calendar',
 			description: 'Allows accurate tracking of the passage of time.',
 			show_in: {tab: 'works', section: 'monuments'},
-			cost_function: function (me) {
-				return {
-					labour: Math.min(me.level+1,5) * 10,
-					fabrications: 10 * (me.level + 1) * Math.pow(1.3, me.level),
-					knowledge: 15 * (me.level - 1) * Math.pow(1.13, me.level-1)
-				}
-			},
+			cost_function: function () {return {labour: 20, fabrications: 20}},
+			max_level: 1,
 			construct: function (me) {
 				me.show_time = function (args) {
 					it.clock.format_time = H.t(args.time)
@@ -2046,16 +2015,34 @@ data = {
 					else me.tick_div.innerHTML = '(Decay in ' + H.t(me.next_decay - me.counter) + ')'
 				}
 			},
-			apply: function () {
-				var me = it.works.calendar;
-				if (me.level) it.clock.check_time.add_result(me.show_time, 201)
-				if (me.level>=2) it.resources.influence.on_tick.add_result(me.increasing, 701)
-				if (me.level>=3) it.resources.corpses.on_tick.add_result(me.corpse_decay, 701)
-				if (me.level>=4) {
-					var i;
+			apply: function (me) {
+				it.clock.check_time.add_result(me.show_time, 201)
+			},
+			upgrades: {
+				track_influence: {
+					name: 'Track Influence',
+					description: 'Determine what your influence is trending towards.',
+					cost: {knowledge: 5, influence: 10},
+					apply: function (me) {it.resources.influence.on_tick.add_result(me.increasing, 701)},
+					unlocked: 1
+				},
+				time_corpse_rot: {
+					name: 'Time Corpse Rot',
+					description: 'Show a timer indicating when the next corpse will rot.',
+					cost: {knowledge: 5, corpses: 1},
+					apply: function (me) {it.resources.corpses.on_tick.add_result(me.corpse_decay, 701)},
+				},
+				study_efficiency: {
+					name: 'Study Worker Efficiency',
+					description: 'Show the efficiency of workers as they are assigned.',
+					cost: {labour: 10, knowledge: 5},
+					apply: function (me) {
+						var i;
 						for (i in it.species) {
-						it.species[i].show_efficiency=true;
-					}
+							it.species[i].show_efficiency=true;
+						}
+					},
+					unlocked: 1
 				}
 			}
 		},
@@ -2064,24 +2051,48 @@ data = {
 			name: 'Bonfire',
 			description: 'Provides warmth so your followers live longer when exposed to the elements',
 			show_in: {tab: 'works', section: 'monuments'},
-			cost_function: function (me) {
-				return {
-					labour: Math.min(me.level+1,5) * 3,
-					fabrications: 5 * (me.level + 1) * Math.pow(1.2, me.level)
-				}
-			},
+			cost_function: function () {return {labour: 10, fabrications: 10}},
+			max_level: 1,
 			atoms: [
 				{
 					type: 'housing_decay',
 					target: 'humans',
 					order: 10,
 					func: function (x, me) {
-						return 1 / (me.level/2 + 4)
+						return 1 / 6
 					}
 				}
 			],
 			apply: function () {
 				it.techs.cooking.unlock({by: 'bonfire'});
+			}
+		},
+		pyramid: {
+			object_type: 'work',
+			name: 'Pyramid',
+			description: 'A huge burial structure associated with unknown rituals.',
+			show_in: {tab: 'works', section: 'monuments'},
+			cost_function: function () {return {labour: 900, fabrications: 300, graves: 15}},
+			max_level: 1,
+			installments: 3,
+			upgrades: {
+				necromancy: {
+					name: 'Necromancy',
+					description: 'Animating the dead.',
+					cost: {influence: 250, foreboding: 5},
+					apply: function () {
+						it.junction.unlock('cult', 'ghouls');
+						it.acts.animate_dead.unlock();
+						it.species.ghouls.unlock();
+						it.works.mausoleum.atoms.push({
+							type: 'max',
+							target: 'ghouls',
+							order: 400,
+							func: function (x) {return x + Math.floor(it.works.mausoleum.level/5)}
+						})
+					},
+					level: 1
+				},
 			}
 		},
 		hovel: {
@@ -2334,7 +2345,7 @@ data = {
 			object_type: 'work',
 			name: 'Icon',
 			description: 'Icons increase the amount of influence your worshippers produce.',
-			show_in: {tab: 'works', section: 'monuments'},
+			show_in: {tab: 'works', section: 'buildings'},
 			cost_function : function (me) {
 				return {
 					influence: 25 * (me.level + 0.5) * Math.pow(1.3, me.level),
@@ -2432,11 +2443,12 @@ data = {
 			show_in: {tab: 'works', section: 'buildings'},
 			cvars: {fabrication_storage_effect: 10},
 			saves: ['processed_ore', 'fabrications'],
+			installments: 2,
 			cost_function: function (me) {
 				return {
-					labour: Math.min(me.level+1,4) * 100,
-					fabrications: 100 * (me.level/2+1) * Math.pow(1.15, me.level),
-					ore: 5 * (me.level/2+1) * Math.pow(1.05, me.level)
+					labour: Math.min(me.level+1,5) * 40,
+					fabrications: 35 * (me.level+1) * Math.pow(1.1, me.level),
+					ore: 8 * (me.level/2+1) * Math.pow(1.15, me.level)
 				}
 			},
 			atoms: [
@@ -2456,11 +2468,12 @@ data = {
 			description: 'Increases the rate of production of fabrications.',
 			cvars: {fabrication_production_effect: .15},
 			show_in: {tab: 'works', section: 'buildings'},
+			installments: 3,
 			cost_function: function (me) {
 				return {
-					labour: Math.min(me.level+1 , 5) * 100,
-					fabrications: 200 * (me.level/2+1) * Math.pow(1.15, me.level),
-					ore: 25 * (me.level/2+1) * Math.pow(1.05, me.level)
+					labour: Math.min(me.level+1 , 5) * 60,
+					fabrications: 40 * (me.level*3/4+1) * Math.pow(1.15, me.level),
+					ore: 10 * (me.level/2+1) * Math.pow(1.15, me.level)
 				}
 			},
 			atoms: [
@@ -2527,8 +2540,8 @@ data = {
 				if (it.works.mausoleum.level>=3) {
 					it.visions.grim_feast.unlock();
 				}
-				if (it.works.mausoleum.level>=10) {
-					it.visions.necromancy.unlock();
+				if (it.works.mausoleum.level>=5) {
+					it.unlock('pyramid');
 				}
 			}
 		},
@@ -2718,10 +2731,10 @@ data = {
 			},
 			atoms: [
 				{
-					type: 'base_interests',
+					type: 'interest_quality',
 					target: 'world_map',
 					order: 400,
-					func: function (x, me) {return x + me.level}
+					func: function (x, me) {return x + .3 * me.level}
 				}
 			],
 			apply: function () {
@@ -2942,7 +2955,7 @@ data = {
 		red_death: {
 			object_type: 'deity',
 			name: 'The Red Death',
-			cvars: {village_killing: 3},
+			cvars: {village_killing: 2},
 			awake: 1,
 			hatred: 3,
 			stature: 0.5,
@@ -3383,6 +3396,21 @@ data = {
 			construct: function (me, my_parent, args) {
 				me.quality = (args&&args.quality) || 0.5 + H.r()/2;
 				me.max_labour = 100;
+				var labour_usage = 0;
+				Object.defineProperties(me, {
+					labour_usage: {
+						get: function () {return labour_usage},
+						set: function (v) {
+							labour_usage = v;
+							me.apply_atoms();
+						}
+					},
+					max_labour: {
+						get: function () {
+							return it.interests.mine.max_labour;
+						}
+					}
+				})
 			},
 			flags: [
 				{
@@ -3561,7 +3589,7 @@ data = {
 					type: 'max',
 					target: 'humans_counter_influence',
 					order: 700,
-					func: function (x) {return x/3}
+					func: function (x) {return x/(1 + it.heavens.ominousness)}
 				}
 			],
 			apply: function () {
@@ -3583,7 +3611,7 @@ data = {
 					type: 'dilation',
 					target: 'clock',
 					order: 700,
-					func: function (x) {return x/5}
+					func: function (x) {return x/(1 + 2 * it.heavens.ominousness)}
 				}
 			],
 			duration: 1/6
@@ -3608,7 +3636,7 @@ data = {
 					targets: ['hunter', 'farmer', 'labourer', 'manufacturer', 'researcher'],
 					order: 700,
 					func: function (x) {
-						return x*2
+						return x*(1 + .5 * it.heavens.ominousness);
 					}
 				}
 			],

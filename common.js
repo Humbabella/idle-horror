@@ -447,6 +447,10 @@ it = {
 		version: '0.0.0',
 		save_parameters: {
 		}
+	},
+	
+	unlock: function (id) {
+		it.ids[id].unlock();
 	}
 }
 
